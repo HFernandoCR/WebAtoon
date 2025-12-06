@@ -206,7 +206,7 @@
 
     <nav class="navbar">
         <div class="logo">
-            <i class="fas fa-laptop-code"></i> WEBATHON
+            <img src="{{ asset('images/logo.png') }}" alt="Webathon Logo" style="height: 40px;"> WEBATHON
         </div>
 
         <div class="auth-buttons">

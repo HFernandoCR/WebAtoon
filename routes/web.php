@@ -39,6 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['role:admin'])->group(function () {
         Route::resource('users', UserController::class)->middleware('throttle:60,1');
         Route::resource('events', EventController::class)->middleware('throttle:60,1');
+        Route::resource('categories', App\Http\Controllers\CategoryController::class)->middleware('throttle:60,1');
         Route::get('/admin/permissions', [PermissionController::class, 'index'])->name('admin.permissions');
     });
 

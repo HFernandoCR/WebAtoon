@@ -18,37 +18,9 @@ class DashboardController extends Controller
         $data = [];
 
         if ($role === 'admin') {
-            // Estadísticas generales
             $data['totalUsers'] = User::count();
-            $data['totalEvents'] = Event::count();
             $data['activeEvents'] = Event::where('status', 'active')->count();
-            $data['finishedEvents'] = Event::where('status', 'finished')->count();
-            $data['inactiveEvents'] = Event::where('status', 'inactive')->count();
-
-            // Estadísticas de proyectos
-            $data['totalProjects'] = Project::count();
-            $data['pendingProjects'] = Project::where('status', 'pending')->count();
-            $data['approvedProjects'] = Project::where('status', 'approved')->count();
-            $data['rejectedProjects'] = Project::where('status', 'rejected')->count();
-
-            // Estadísticas de usuarios por rol
-            $data['totalAdmins'] = User::role('admin')->count();
-            $data['totalManagers'] = User::role('event_manager')->count();
             $data['totalJudges'] = User::role('judge')->count();
-            $data['totalAdvisors'] = User::role('advisor')->count();
-            $data['totalStudents'] = User::role('student')->count();
-
-            // Proyectos recientes (últimos 5)
-            $data['recentProjects'] = Project::with(['author', 'event'])
-                ->orderBy('created_at', 'desc')
-                ->take(5)
-                ->get();
-
-            // Eventos próximos (próximos 3)
-            $data['upcomingEvents'] = Event::where('start_date', '>', now())
-                ->orderBy('start_date', 'asc')
-                ->take(3)
-                ->get();
         } 
         elseif ($role === 'event_manager') {
             $event = Event::where('manager_id', $user->id)->first();

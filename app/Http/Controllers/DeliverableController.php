@@ -51,6 +51,13 @@ class DeliverableController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
+        $event = $project->event;
+        $now = now();
+
+        if ($now < $event->start_date || $now > $event->end_date) {
+            return redirect()->back()->with('error', 'No puedes subir entregables fuera de las fechas del evento.');
+        }
+
         if ($request->hasFile('file') && $request->file('file')->isValid()) {
             $originalName = $request->file('file')->getClientOriginalName();
             $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $originalName);
