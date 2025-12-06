@@ -1,81 +1,3 @@
-<style>
-    /* Estilos rápidos para que el sidebar se vea decente */
-    .sidebar {
-        padding: 20px;
-    }
-
-    .user-profile {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .user-profile img {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin-bottom: 10px;
-        background: #ddd;
-    }
-
-    .badge {
-        background: #3498db;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 0.8em;
-    }
-
-    .menu-list ul {
-        list-style: none;
-        padding: 0;
-    }
-
-    .menu-list li {
-        margin-bottom: 10px;
-    }
-
-    .menu-header {
-        color: #95a5a6;
-        font-size: 0.85em;
-        text-transform: uppercase;
-        margin-top: 20px;
-        margin-bottom: 5px;
-        font-weight: bold;
-    }
-
-    .nav-link {
-        color: #ecf0f1;
-        text-decoration: none;
-        display: block;
-        padding: 10px;
-        border-radius: 5px;
-        transition: background 0.3s;
-    }
-
-    .nav-link:hover {
-        background: #34495e;
-    }
-
-    /* Botón de cerrar sesión */
-    .logout-form {
-        margin: 0;
-    }
-
-    .btn-logout {
-        background: none;
-        border: none;
-        width: 100%;
-        text-align: left;
-        cursor: pointer;
-        color: #e74c3c;
-    }
-
-    .btn-logout:hover {
-        background: #c0392b;
-        color: white;
-    }
-</style>
-
-<aside class="sidebar">
 
     <x-app-layout>
         <x-slot name="header">
@@ -182,204 +104,27 @@
                 {{-- ========================================================= --}}
                 {{-- VISTA: ADMIN --}}
                 {{-- ========================================================= --}}
+                {{-- ========================================================= --}}
+                {{-- VISTA: ADMIN --}}
+                {{-- ========================================================= --}}
                 @role('admin')
-
-                {{-- Métricas Principales --}}
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;">
-                    <div class="card" style="border-left: 5px solid #3498db; text-align: center;">
-                        <h4 style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 10px;">Usuarios Totales</h4>
-                        <p style="font-size: 2.5rem; font-weight: bold; color: #3498db; margin: 0;">{{ $totalUsers ?? 0 }}</p>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                    <div class="card" style="border-left: 5px solid #3498db;">
+                        <h4>Usuarios Totales</h4>
+                        <p style="font-size: 2rem; font-weight: bold;"> {{ $totalUsers ?? 0 }} </p>
                     </div>
-                    <div class="card" style="border-left: 5px solid #e67e22; text-align: center;">
-                        <h4 style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 10px;">Eventos Activos</h4>
-                        <p style="font-size: 2.5rem; font-weight: bold; color: #e67e22; margin: 0;">{{ $activeEvents ?? 0 }}</p>
+                    <div class="card" style="border-left: 5px solid #e74c3c;">
+                        <h4>Competencias Activas</h4>
+                        <p style="font-size: 2rem; font-weight: bold;">
+                            {{ $activeEvents ?? 0 }}
+                        </p>
                     </div>
-                    <div class="card" style="border-left: 5px solid #9b59b6; text-align: center;">
-                        <h4 style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 10px;">Total Proyectos</h4>
-                        <p style="font-size: 2.5rem; font-weight: bold; color: #9b59b6; margin: 0;">{{ $totalProjects ?? 0 }}</p>
-                    </div>
-                    <div class="card" style="border-left: 5px solid #f1c40f; text-align: center;">
-                        <h4 style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 10px;">Proyectos Pendientes</h4>
-                        <p style="font-size: 2.5rem; font-weight: bold; color: #f1c40f; margin: 0;">{{ $pendingProjects ?? 0 }}</p>
+                    <div class="card" style="border-left: 5px solid #2ecc71;">
+                        <h4>Jueces Registrados</h4>
+                        <p style="font-size: 2rem; font-weight: bold;"> {{ $totalJudges ?? 0 }}
+                        </p>
                     </div>
                 </div>
-
-                {{-- Desglose de Eventos y Proyectos --}}
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-
-                    {{-- Eventos por Estado --}}
-                    <div class="card">
-                        <h3>Estado de Eventos</h3>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
-                            <div style="text-align: center; padding: 15px; background: #ecf0f1; border-radius: 8px;">
-                                <p style="font-size: 1.8rem; font-weight: bold; color: #2ecc71; margin: 0;">{{ $activeEvents ?? 0 }}</p>
-                                <p style="font-size: 0.85em; color: #7f8c8d; margin-top: 5px;">Activos</p>
-                            </div>
-                            <div style="text-align: center; padding: 15px; background: #ecf0f1; border-radius: 8px;">
-                                <p style="font-size: 1.8rem; font-weight: bold; color: #95a5a6; margin: 0;">{{ $finishedEvents ?? 0 }}</p>
-                                <p style="font-size: 0.85em; color: #7f8c8d; margin-top: 5px;">Finalizados</p>
-                            </div>
-                            <div style="text-align: center; padding: 15px; background: #ecf0f1; border-radius: 8px;">
-                                <p style="font-size: 1.8rem; font-weight: bold; color: #e74c3c; margin: 0;">{{ $inactiveEvents ?? 0 }}</p>
-                                <p style="font-size: 0.85em; color: #7f8c8d; margin-top: 5px;">Inactivos</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Proyectos por Estado --}}
-                    <div class="card">
-                        <h3>Estado de Proyectos</h3>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
-                            <div style="text-align: center; padding: 15px; background: #ecf0f1; border-radius: 8px;">
-                                <p style="font-size: 1.8rem; font-weight: bold; color: #2ecc71; margin: 0;">{{ $approvedProjects ?? 0 }}</p>
-                                <p style="font-size: 0.85em; color: #7f8c8d; margin-top: 5px;">Aprobados</p>
-                            </div>
-                            <div style="text-align: center; padding: 15px; background: #ecf0f1; border-radius: 8px;">
-                                <p style="font-size: 1.8rem; font-weight: bold; color: #f1c40f; margin: 0;">{{ $pendingProjects ?? 0 }}</p>
-                                <p style="font-size: 0.85em; color: #7f8c8d; margin-top: 5px;">Pendientes</p>
-                            </div>
-                            <div style="text-align: center; padding: 15px; background: #ecf0f1; border-radius: 8px;">
-                                <p style="font-size: 1.8rem; font-weight: bold; color: #e74c3c; margin: 0;">{{ $rejectedProjects ?? 0 }}</p>
-                                <p style="font-size: 0.85em; color: #7f8c8d; margin-top: 5px;">Rechazados</p>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                {{-- Usuarios por Rol --}}
-                <div class="card" style="margin-bottom: 30px;">
-                    <h3>Usuarios por Rol</h3>
-                    <table class="custom-table" style="margin-top: 15px;">
-                        <thead>
-                            <tr>
-                                <th>Rol</th>
-                                <th style="text-align: center;">Cantidad</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Administradores</strong></td>
-                                <td style="text-align: center;">{{ $totalAdmins ?? 0 }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Gestores de Eventos</strong></td>
-                                <td style="text-align: center;">{{ $totalManagers ?? 0 }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Jueces</strong></td>
-                                <td style="text-align: center;">{{ $totalJudges ?? 0 }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Asesores</strong></td>
-                                <td style="text-align: center;">{{ $totalAdvisors ?? 0 }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Estudiantes</strong></td>
-                                <td style="text-align: center;">{{ $totalStudents ?? 0 }}</td>
-                            </tr>
-                            <tr style="background: #f8f9fa; font-weight: bold;">
-                                <td><strong>Total</strong></td>
-                                <td style="text-align: center;">{{ $totalUsers ?? 0 }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                {{-- Eventos Próximos y Proyectos Recientes --}}
-                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 30px;">
-
-                    {{-- Eventos Próximos --}}
-                    <div class="card">
-                        <h3>Eventos Próximos</h3>
-                        @if(isset($upcomingEvents) && $upcomingEvents->count() > 0)
-                            <ul style="list-style: none; padding: 0; margin-top: 15px;">
-                                @foreach($upcomingEvents as $event)
-                                    <li style="padding: 10px; background: #ecf0f1; margin-bottom: 10px; border-radius: 5px;">
-                                        <strong>{{ $event->name }}</strong><br>
-                                        <small style="color: #7f8c8d;">{{ \Carbon\Carbon::parse($event->start_date)->format('d/m/Y') }}</small>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <p style="color: #7f8c8d; margin-top: 15px;">No hay eventos programados</p>
-                        @endif
-                    </div>
-
-                    {{-- Proyectos Recientes --}}
-                    <div class="card">
-                        <h3>Proyectos Recientes</h3>
-                        @if(isset($recentProjects) && $recentProjects->count() > 0)
-                            <table class="custom-table" style="margin-top: 15px;">
-                                <thead>
-                                    <tr>
-                                        <th>Proyecto</th>
-                                        <th>Autor</th>
-                                        <th>Evento</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($recentProjects as $project)
-                                        <tr>
-                                            <td><strong>{{ $project->title }}</strong></td>
-                                            <td>{{ $project->author->name ?? 'N/A' }}</td>
-                                            <td>{{ $project->event->name ?? 'N/A' }}</td>
-                                            <td>
-                                                @if($project->status == 'approved')
-                                                    <span class="status-badge status-approved">Aprobado</span>
-                                                @elseif($project->status == 'rejected')
-                                                    <span class="status-badge" style="background: #e74c3c;">Rechazado</span>
-                                                @else
-                                                    <span class="status-badge status-pending">Pendiente</span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        @else
-                            <p style="color: #7f8c8d; margin-top: 15px;">No hay proyectos registrados</p>
-                        @endif
-                    </div>
-
-                </div>
-
-                {{-- Accesos Rápidos --}}
-                <div class="card">
-                    <h3>Accesos Rápidos</h3>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
-                        <a href="{{ route('users.create') }}" class="btn-action" style="text-align: center; padding: 15px; background: #3498db;">
-                            + Crear Usuario
-                        </a>
-                        <a href="{{ route('events.create') }}" class="btn-action" style="text-align: center; padding: 15px; background: #e67e22;">
-                            + Crear Evento
-                        </a>
-                        <a href="{{ route('events.index') }}" class="btn-action" style="text-align: center; padding: 15px; background: #9b59b6;">
-                            Ver Todos los Eventos
-                        </a>
-                    </div>
-                </div>
-
-                {{-- Resumen del Sistema --}}
-                <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-top: 20px;">
-                    <h3 style="color: white; border-bottom: 2px solid rgba(255,255,255,0.3);">Resumen del Sistema</h3>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 15px;">
-                        <div style="text-align: center;">
-                            <p style="font-size: 2rem; font-weight: bold; margin: 0;">{{ $totalEvents ?? 0 }}</p>
-                            <p style="font-size: 0.9em; opacity: 0.9; margin-top: 5px;">Eventos Totales</p>
-                        </div>
-                        <div style="text-align: center;">
-                            <p style="font-size: 2rem; font-weight: bold; margin: 0;">{{ $totalProjects ?? 0 }}</p>
-                            <p style="font-size: 0.9em; opacity: 0.9; margin-top: 5px;">Proyectos Totales</p>
-                        </div>
-                        <div style="text-align: center;">
-                            <p style="font-size: 2rem; font-weight: bold; margin: 0;">{{ $totalUsers ?? 0 }}</p>
-                            <p style="font-size: 0.9em; opacity: 0.9; margin-top: 5px;">Usuarios Totales</p>
-                        </div>
-                    </div>
-                </div>
-
                 @endrole
 
 

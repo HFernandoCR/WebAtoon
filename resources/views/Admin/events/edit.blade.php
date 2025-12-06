@@ -29,10 +29,23 @@
 
                 <form action="{{ route('events.update', $event) }}" method="POST">
                     @csrf
-                    @method('PUT') <div style="margin-bottom: 20px;">
+                    @method('PUT')
+                     <div style="margin-bottom: 20px;">
                         <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600;">Nombre del Evento <span style="color:red">*</span></label>
                         <input type="text" name="name" value="{{ old('name', $event->name) }}" required 
                                style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; background: #f9fafb;">
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600;">Categoría del Evento</label>
+                        <select name="category_id" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; background: white;">
+                            <option value="">-- Seleccione una Categoría (Opcional) --</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ old('category_id', $event->category_id) == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">

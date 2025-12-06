@@ -13,6 +13,7 @@ class Event extends Model
     protected $fillable = [
         'name',
         'manager_id',
+        'category_id',
         'description',
         'start_date',
         'end_date',
@@ -28,22 +29,8 @@ class Event extends Model
         return $this->belongsTo(User::class, 'manager_id');
     }
 
-    /**
-     * Verifica si el evento está dentro de las fechas permitidas para inscripciones
-     */
-    public function isOpen()
+    public function category()
     {
-        $now = now()->toDateString();
-        return $this->status === 'active' &&
-               $now >= $this->start_date &&
-               $now <= $this->end_date;
-    }
-
-    /**
-     * Verifica si el evento ya finalizó
-     */
-    public function hasEnded()
-    {
-        return now()->toDateString() > $this->end_date;
+        return $this->belongsTo(Category::class);
     }
 }

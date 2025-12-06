@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Event;
+use App\Models\Category;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 
@@ -19,8 +20,9 @@ class EventController extends Controller
     {
         $this->authorize('create', Event::class);
         $managers = User::role('event_manager')->get();
+        $categories = Category::all();
 
-        return view('Admin.events.create', compact('managers'));
+        return view('Admin.events.create', compact('managers', 'categories'));
     }
 
     public function store(Request $request)
@@ -29,6 +31,7 @@ class EventController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'manager_id' => 'required|exists:users,id',
+            'category_id' => 'nullable|exists:categories,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'status' => 'required'
@@ -62,8 +65,9 @@ class EventController extends Controller
     {
         $this->authorize('update', $event);
         $managers = User::role('event_manager')->get();
+        $categories = Category::all();
 
-        return view('Admin.events.edit', compact('event', 'managers'));
+        return view('Admin.events.edit', compact('event', 'managers', 'categories'));
     }
 
     public function update(Request $request, Event $event)
@@ -72,6 +76,7 @@ class EventController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'manager_id' => 'required|exists:users,id',
+            'category_id' => 'nullable|exists:categories,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);

@@ -28,11 +28,15 @@ class ProjectController extends Controller
     public function create()
     {
         $this->authorize('create', Project::class);
-        $activeEvents = Event::where('status', 'active')->get();
+        $activeEvents = Event::where('status', 'active')
+            ->whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now())
+            ->get();
+        $categories = \App\Models\Category::all();
 
         $advisors = \App\Models\User::role('advisor')->get();
 
-        return view('Student.projects.create', compact('activeEvents', 'advisors'));
+        return view('Student.projects.create', compact('activeEvents', 'advisors', 'categories'));
     }
 
     /**
@@ -45,15 +49,16 @@ class ProjectController extends Controller
             'title' => 'required|max:255',
             'event_id' => 'required|exists:events,id',
             'advisor_id' => 'nullable|exists:users,id',
-            'category' => 'required',
+            'category' => 'required|exists:categories,code',
             'description' => 'required',
             'repository_url' => 'nullable|url'
         ]);
 
         $event = Event::findOrFail($request->event_id);
+        $now = now();
 
-        if (!$event->isOpen()) {
-            return back()->withErrors(['event_id' => 'El evento seleccionado no está disponible para inscripciones. Debe estar activo y dentro de las fechas permitidas.'])->withInput();
+        if ($now < $event->start_date || $now > $event->end_date) {
+            return back()->withErrors(['event_id' => 'El evento no está activo en este momento.'])->withInput();
         }
 
         $project = Project::create([
@@ -126,8 +131,12 @@ class ProjectController extends Controller
         $this->authorize('update', $project);
 
 
-        $activeEvents = Event::where('status', 'active')->get();
-        return view('Student.projects.edit', compact('project', 'activeEvents'));
+        $activeEvents = Event::where('status', 'active')
+            ->whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now())
+            ->get();
+        $categories = \App\Models\Category::all();
+        return view('Student.projects.edit', compact('project', 'activeEvents', 'categories'));
     }
 
     public function update(Request $request, Project $project)
@@ -136,9 +145,16 @@ class ProjectController extends Controller
 
         $request->validate([
             'title' => 'required|max:255',
-            'category' => 'required',
+            'category' => 'required|exists:categories,code',
             'description' => 'required',
         ]);
+
+        $event = $project->event;
+        $now = now();
+
+        if ($now < $event->start_date || $now > $event->end_date) {
+            return back()->withErrors(['error' => 'No puedes editar el proyecto fuera de las fechas del evento.']);
+        }
 
         $project->update($request->all());
 
@@ -148,6 +164,13 @@ class ProjectController extends Controller
     public function destroy(Project $project)
     {
         $this->authorize('delete', $project);
+
+        $event = $project->event;
+        $now = now();
+
+        if ($now < $event->start_date || $now > $event->end_date) {
+            return back()->with('error', 'No puedes eliminar el proyecto fuera de las fechas del evento.');
+        }
 
         $projectTitle = $project->title;
         $studentName = $project->user->name;

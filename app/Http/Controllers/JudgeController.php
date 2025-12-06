@@ -24,14 +24,9 @@ class JudgeController extends Controller
     public function edit(Project $project)
     {
         $isAssigned = Auth::user()->judgedProjects->contains($project->id);
-
+        
         if (!$isAssigned) {
             abort(403, 'No tienes asignado este proyecto.');
-        }
-
-        if ($project->event && $project->event->hasEnded()) {
-            return redirect()->route('judge.dashboard')
-                ->with('error', 'El evento "' . $project->event->name . '" ha finalizado. Ya no se pueden enviar evaluaciones.');
         }
 
         $evaluation = $project->judges()->where('user_id', Auth::id())->first()->pivot;
@@ -44,7 +39,7 @@ class JudgeController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-
+        
         $request->validate([
             'score_document' => 'required|numeric|min:0|max:100',
             'score_presentation' => 'required|numeric|min:0|max:100',
@@ -54,9 +49,11 @@ class JudgeController extends Controller
 
         if (!Auth::user()->judgedProjects->contains($project->id)) abort(403);
 
-        if ($project->event && $project->event->hasEnded()) {
-            return redirect()->route('judge.dashboard')
-                ->with('error', 'El evento "' . $project->event->name . '" ha finalizado. Ya no se pueden enviar evaluaciones.');
+        $event = $project->event;
+        $now = now();
+
+        if ($now < $event->start_date || $now > $event->end_date) {
+            return redirect()->back()->with('error', 'No puedes evaluar el proyecto fuera de las fechas del evento.');
         }
 
         // Calcular promedio ponderado

@@ -9,7 +9,7 @@ class AdvisorController extends Controller
 {
     public function index()
     {
-        // Obtener proyectos donde yo soy el advisor_id   
+        // Obtener proyectos donde yo soy el advisor_id
         $projects = Auth::user()->advisedProjects()
                         ->with('event', 'author') // Traer datos del evento y del alumno líder
                         ->paginate(10);

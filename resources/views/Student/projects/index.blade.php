@@ -29,7 +29,6 @@
                             <th style="padding: 15px; text-align: left;">Evento</th>
                             <th style="padding: 15px; text-align: left;">Categoría</th>
                             <th style="padding: 15px; text-align: center;">Calificación</th> <th style="padding: 15px; text-align: left;">Estado</th>
-                            <th style="padding: 15px; text-align: center;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -100,15 +99,6 @@
                                 <span style="background-color: {{ $statusColor }}; color: white; padding: 4px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold;">
                                     {{ $statusLabel }}
                                 </span>
-                            </td>
-                            <td style="padding: 15px; text-align: center;">
-                                <div style="display: flex; justify-content: center; gap: 10px;">
-                                    <a href="{{ route('projects.edit', $project) }}" style="color: #f39c12; font-weight: bold;">Editar</a>
-                                    <form action="{{ route('projects.destroy', $project) }}" method="POST" onsubmit="return confirm('¿Cancelar inscripción?');">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" style="color: #e74c3c; background: none; border: none; font-weight: bold; cursor: pointer;">X</button>
-                                    </form>
-                                </div>
                             </td>
                         </tr>
                         @endforeach

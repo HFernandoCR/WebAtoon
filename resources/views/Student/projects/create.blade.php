@@ -56,10 +56,10 @@
                             <label>Categoría</label>
                             <select name="category" required
                                 style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                                <option value="software">Software / Apps</option>
-                                <option value="hardware">Hardware / Robótica</option>
-                                <option value="innovation">Innovación Social</option>
-                                <option value="research">Investigación</option>
+                                <option value="">-- Selecciona una categoría --</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->code }}">{{ $cat->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div>
