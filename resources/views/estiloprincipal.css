@@ -1,0 +1,152 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #fff;
+}
+
+.navbar {
+    background-color: #6d28d9;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-login {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.btn-login:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.hero {
+    background-color: #6d28d9;
+    background: linear-gradient(180deg, #6d28d9 0%, #5b21b6 100%);
+    color: white;
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.hero h1 {
+    font-size: 42px;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.hero p {
+    font-size: 18px;
+    max-width: 600px;
+    margin: 0 auto;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.features-section {
+    padding: 60px 20px;
+    text-align: center;
+    background-color: #fff;
+}
+
+.section-title {
+    color: #6d28d9;
+    font-size: 28px;
+    margin-bottom: 50px;
+}
+
+.cards-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+.feature-card {
+    background-color: #f9fafb;
+    padding: 40px 30px;
+    border-radius: 12px;
+    flex: 1;
+    min-width: 300px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    transition: transform 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.icon-wrapper {
+    color: #8b5cf6;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    color: #6d28d9;
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.feature-card p {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.cta-footer {
+    background-color: #6d28d9;
+    color: white;
+    text-align: center;
+    padding: 80px 20px 20px 20px;
+    margin-top: auto;
+}
+
+.cta-content h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+.cta-content p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin-bottom: 60px;
+}
+
+.copyright {
+    font-size: 12px;
+    opacity: 0.6;
+    text-align: left;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .hero h1 { font-size: 32px; }
+    .cards-container { flex-direction: column; }
+}

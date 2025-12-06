@@ -1,0 +1,276 @@
+# ============================================
+# GITIGNORE PARA PROYECTO WEBATOON
+# Laravel 11 - Trabajo colaborativo Linux/Windows
+# ============================================
+
+# ============================================
+# ARCHIVOS DE CONFIGURACIÓN SENSIBLES
+# ============================================
+.env
+.env.backup
+.env.production
+.env.local
+.env.*.local
+auth.json
+
+# ============================================
+# DEPENDENCIAS (SE INSTALAN CON COMPOSER/NPM)
+# ============================================
+/vendor/
+/node_modules/
+
+# ============================================
+# COMPOSER - ARCHIVOS TEMPORALES Y LOCALES
+# ============================================
+composer.phar
+composer.lock.tmp
+.composer/
+# NOTA: composer.json y composer.lock SÍ deben estar versionados
+
+# ============================================
+# NPM/YARN - ARCHIVOS TEMPORALES
+# ============================================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+package-lock.json.tmp
+yarn.lock.tmp
+
+# ============================================
+# LARAVEL - ARCHIVOS GENERADOS
+# ============================================
+/public/hot
+/public/storage
+/public/build
+/storage/*.key
+/storage/pail
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+
+# ============================================
+# LARAVEL - ARCHIVOS DE CACHE Y TESTING
+# ============================================
+.phpunit.result.cache
+.phpunit.cache
+*.cache
+.php-cs-fixer.cache
+.php_cs.cache
+/phpunit.xml
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+
+# ============================================
+# PHP - ARCHIVOS TEMPORALES
+# ============================================
+*.php~
+*.php.bak
+*.php.swp
+
+# ============================================
+# LOGS
+# ============================================
+*.log
+/storage/logs/*.log
+!/storage/logs/.gitkeep
+
+# ============================================
+# SISTEMA OPERATIVO - MACOS
+# ============================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# ============================================
+# SISTEMA OPERATIVO - WINDOWS
+# ============================================
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ============================================
+# SISTEMA OPERATIVO - LINUX
+# ============================================
+*~
+*.swp
+*.swo
+*.swn
+*.un~
+\#*\#
+.\#*
+
+# ============================================
+# EDITORES - VSCODE
+# ============================================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+*.code-workspace
+
+# ============================================
+# EDITORES - PHPSTORM / INTELLIJ
+# ============================================
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+atlassian-ide-plugin.xml
+
+# ============================================
+# EDITORES - SUBLIME TEXT
+# ============================================
+*.sublime-project
+*.sublime-workspace
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+sftp-config.json
+sftp-config-alt*.json
+
+# ============================================
+# EDITORES - ECLIPSE
+# ============================================
+.project
+.buildpath
+.settings/
+*.launch
+.cproject
+.pydevproject
+
+# ============================================
+# EDITORES - VIM
+# ============================================
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+.netrwhist
+
+# ============================================
+# EDITORES - EMACS
+# ============================================
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ============================================
+# EDITORES - NETBEANS
+# ============================================
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# ============================================
+# ENTORNOS DE DESARROLLO
+# ============================================
+/.fleet
+/.nova
+/.zed
+
+# ============================================
+# ARCHIVOS DE BACKUP
+# ============================================
+*.bak
+*.backup
+*.tmp
+*.temp
+*.old
+*.orig
+
+# ============================================
+# ARCHIVOS DE BASE DE DATOS LOCAL
+# ============================================
+*.sqlite
+*.sqlite3
+*.db
+database/*.sqlite
+database/*.sqlite3
+!/database/.gitkeep
+
+# ============================================
+# ARCHIVOS DE DOCUMENTACIÓN GENERADA
+# ============================================
+/docs/_build/
+/.phpactor.json
+
+# ============================================
+# ARCHIVOS DE TESTING
+# ============================================
+coverage/
+.coverage
+.phpunit.cache
+.pest/
+
+# ============================================
+# COMPILADOS Y MINIFICADOS
+# ============================================
+*.min.js
+*.min.css
+# NOTA: Si usas Vite/Mix, estos se generan automáticamente
+
+# ============================================
+# CERTIFICADOS Y CLAVES (NUNCA SUBIR)
+# ============================================
+*.pem
+*.key
+*.cert
+*.crt
+*.csr
+*.p12
+*.pfx
+
+# ============================================
+# ARCHIVOS GRANDES / MEDIA
+# ============================================
+# Descomentar si no quieres versionar archivos grandes
+# *.mp4
+# *.mp3
+# *.avi
+# *.mov
+# *.zip
+# *.rar
+# *.tar.gz
+
+# ============================================
+# DOCKER (si lo usan en el futuro)
+# ============================================
+docker-compose.override.yml
+.docker/
+
+# ============================================
+# CONFIGURACIONES LOCALES DE DESARROLLO
+# ============================================
+.php-version
+.phpactor.json
+.phpstorm.meta.php
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php/
+
+# ============================================
+# FIN DEL ARCHIVO
+# ============================================

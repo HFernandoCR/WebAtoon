@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+                public function up(): void
+            {
+                Schema::table('projects', function (Blueprint $table) {
+                    // Puede ser nulo por si algún equipo participa de forma independiente
+                    $table->foreignId('advisor_id')
+                        ->nullable()
+                        ->after('user_id')
+                        ->constrained('users')
+                        ->onDelete('set null');
+                });
+            }
+
+    /**
+     * Reverse the migrations.
+     */
+            public function down(): void
+            {
+                Schema::table('projects', function (Blueprint $table) {
+                    $table->dropForeign(['advisor_id']);
+                    $table->dropColumn('advisor_id');
+                });
+            }
+};
