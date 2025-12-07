@@ -78,7 +78,7 @@
                                     </td>
                                     <td style="text-align: right; padding: 10px;">
                                         <form action="{{ route('team.remove', $member->id) }}" method="POST"
-                                            onsubmit="return confirm('¿Expulsar/Cancelar?');">
+                                            onsubmit="return confirmAction(event, '¿Expulsar Miembro?', '¿Estás seguro de expulsar a este miembro?', 'Sí, confirmar')">
                                             @csrf @method('DELETE')
                                             <button
                                                 style="color: #e74c3c; background: none; border: none; cursor: pointer; font-weight: bold;">

@@ -69,7 +69,7 @@
                                         <a href="{{ route('users.edit', $user) }}"
                                             style="color: #f39c12; font-weight: 600; text-decoration: none;">Editar</a>
                                         <form action="{{ route('users.destroy', $user) }}" method="POST"
-                                            onsubmit="return confirm('¿Eliminar a {{ $user->name }}? Esta acción no se puede deshacer.');">
+                                            onsubmit="return confirmAction(event, '¿Eliminar Usuario?', 'Se eliminará el usuario {{ $user->name }} y todos sus datos relacionados.', 'Sí, eliminar')">
                                             @csrf @method('DELETE')
                                             <button type="submit"
                                                 style="color: #e74c3c; background: none; border: none; font-weight: 600; cursor: pointer; padding: 0;">Eliminar</button>
