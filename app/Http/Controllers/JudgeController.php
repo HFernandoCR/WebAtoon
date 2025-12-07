@@ -79,6 +79,14 @@ class JudgeController extends Controller
             $request->feedback
         ));
 
+        // ACTUALIZACIÓN DE RANKING AUTOMÁTICA
+        // 1. Recalcular promedio de este proyecto
+        $rankingService = app(\App\Services\RankingService::class);
+        $rankingService->calculateProjectAverage($project);
+
+        // 2. Recalcular posiciones de todo el evento
+        $rankingService->updateEventRankings($project->event_id);
+
         $event = $project->event;
         if ($event && $event->manager_id) {
             Notification::create([

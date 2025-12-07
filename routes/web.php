@@ -35,6 +35,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy')->middleware('throttle:30,1');
     Route::delete('/notifications', [NotificationController::class, 'destroyAll'])->name('notifications.destroyAll')->middleware('throttle:5,1');
 
+    // === RANKINGS (Iteración 4) ===
+    Route::get('/rankings', [App\Http\Controllers\RankingController::class, 'index'])->name('rankings.index');
+    Route::post('/rankings/{event}/recalculate', [App\Http\Controllers\RankingController::class, 'recalculate'])->name('rankings.recalculate')->middleware(['role:admin|event_manager']);
+
 
     Route::middleware(['role:admin'])->group(function () {
         Route::resource('users', UserController::class)->middleware('throttle:60,1');

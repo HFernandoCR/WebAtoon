@@ -17,8 +17,41 @@ class Project extends Model
         'description',
         'category',
         'repository_url',
-        'status'
+        'status',
+        'average_score',
+        'ranking_position'
     ];
+
+    /**
+     * Accesor para obtener la medalla según la posición
+     */
+    public function getMedalAttribute()
+    {
+        return match ($this->ranking_position) {
+            1 => '🥇',
+            2 => '🥈',
+            3 => '🥉',
+            default => ''
+        };
+    }
+
+    /**
+     * Helper para saber si está en el podio
+     */
+    public function isTopThree()
+    {
+        return $this->ranking_position >= 1 && $this->ranking_position <= 3;
+    }
+
+    /**
+     * Scope para obtener solo proyectos rankeados de un evento
+     */
+    public function scopeRanked($query, $eventId)
+    {
+        return $query->where('event_id', $eventId)
+            ->whereNotNull('ranking_position')
+            ->orderBy('ranking_position', 'asc');
+    }
 
     // Relación: Pertenece a un Estudiante
     public function author()
@@ -37,7 +70,7 @@ class Project extends Model
     {
         return $this->hasMany(\App\Models\ProjectMember::class);
     }
-    
+
     // Solo los aceptados (para contar integrantes)
     public function acceptedMembers()
     {
@@ -48,8 +81,8 @@ class Project extends Model
     public function judges()
     {
         return $this->belongsToMany(User::class, 'project_judge')
-                    ->withPivot('score', 'feedback', 'score_document', 'score_presentation', 'score_demo')
-                    ->withTimestamps();
+            ->withPivot('score', 'feedback', 'score_document', 'score_presentation', 'score_demo')
+            ->withTimestamps();
     }
 
 
