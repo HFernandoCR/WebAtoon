@@ -130,6 +130,12 @@
                 </a>
             </li>
 
+            <li>
+                <a href="{{ route('rankings.index') }}" class="nav-link">
+                    <i class="icon-trophy"></i> Resultados del Evento
+                </a>
+            </li>
+
             @role('admin')
             <li class="menu-header">Administración</li>
             <li>
