@@ -20,7 +20,81 @@
 </head>
 
 <body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100">
+    <style>
+        /* Estilos Responsivos */
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+            z-index: 50;
+        }
+
+        #sidebarToggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 100;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            #sidebarToggle {
+                display: block;
+            }
+
+            .flex-container {
+                flex-direction: column;
+            }
+
+            .sidebar-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                width: 260px;
+                transform: translateX(-100%);
+                z-index: 50;
+            }
+
+            .sidebar-container.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                padding-top: 60px !important;
+                /* Espacio para el botón hamburguesa */
+                width: 100%;
+            }
+
+            /* Overlay para cerrar sidebar al hacer clic fuera */
+            #sidebarOverlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+            }
+
+            #sidebarOverlay.active {
+                display: block;
+            }
+        }
+    </style>
+
+    <button id="sidebarToggle" onclick="toggleSidebar()">
+        ☰ Menú
+    </button>
+    <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="min-h-screen bg-gray-100 flex-container">
         @include('layouts.navigation')
 
         <!-- Page Heading -->
@@ -38,8 +112,19 @@
         </main>
     </div>
 
-    {{-- Script Global para SweetAlert2 --}}
+    {{-- Script Global para SweetAlert2 y Sidebar --}}
     <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar-container');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar) {
+                sidebar.classList.toggle('active');
+            }
+            if (overlay) {
+                overlay.classList.toggle('active');
+            }
+        }
+
         function confirmAction(event, title, text, confirmButtonText) {
             event.preventDefault();
             const form = event.target.closest('form');
