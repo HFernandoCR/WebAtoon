@@ -22,7 +22,8 @@
             @if(session('success'))
                 <div
                     style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                    {{ session('success') }}</div>
+                    {{ session('success') }}
+                </div>
             @endif
 
             <div
@@ -54,7 +55,7 @@
                                         <a href="{{ route('events.edit', $event) }}"
                                             style="color: #f39c12; font-weight: bold;">Editar</a>
                                         <form action="{{ route('events.destroy', $event) }}" method="POST"
-                                            onsubmit="return confirm('¿Borrar evento?');">
+                                            onsubmit="return confirmAction(event, '¿Borrar Evento?', 'Esta acción eliminará el evento y todos sus proyectos asociados. No se puede deshacer.', 'Sí, borrar evento')">
                                             @csrf @method('DELETE')
                                             <button type="submit"
                                                 style="color: #e74c3c; background: none; border: none; font-weight: bold; cursor: pointer;">X</button>
