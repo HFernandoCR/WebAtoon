@@ -50,36 +50,52 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                             <div>
                                 <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #555;">
-                                    Memoria Técnica (20%)
+                                    Memoria Técnica (Max: 20 pts)
                                 </label>
-                                <input type="number" name="score_document" 
-                                    value="{{ old('score_document', $evaluation->score_document ?? '') }}" 
-                                    min="0" max="100" step="0.1" required
+                                <input type="number" name="score_document"
+                                    value="{{ old('score_document', $evaluation->score_document ?? '') }}" min="0"
+                                    max="20" step="0.1" required
+                                    class="@error('score_document') border-red-500 @enderror"
                                     style="width: 100%; padding: 10px; border: 2px solid #3498db; border-radius: 5px; text-align: center; font-weight: bold;">
+                                @error('score_document')
+                                    <span
+                                        style="color: red; font-size: 0.8em; display: block; margin-top: 5px;">{{ $message }}</span>
+                                @enderror
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #555;">
-                                    Exposición (30%)
+                                    Exposición (Max: 30 pts)
                                 </label>
-                                <input type="number" name="score_presentation" 
-                                    value="{{ old('score_presentation', $evaluation->score_presentation ?? '') }}" 
-                                    min="0" max="100" step="0.1" required
+                                <input type="number" name="score_presentation"
+                                    value="{{ old('score_presentation', $evaluation->score_presentation ?? '') }}"
+                                    min="0" max="30" step="0.1" required
+                                    class="@error('score_presentation') border-red-500 @enderror"
                                     style="width: 100%; padding: 10px; border: 2px solid #9b59b6; border-radius: 5px; text-align: center; font-weight: bold;">
+                                @error('score_presentation')
+                                    <span
+                                        style="color: red; font-size: 0.8em; display: block; margin-top: 5px;">{{ $message }}</span>
+                                @enderror
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #555;">
-                                    Prototipo (50%)
+                                    Prototipo (Max: 50 pts)
                                 </label>
-                                <input type="number" name="score_demo" 
-                                    value="{{ old('score_demo', $evaluation->score_demo ?? '') }}" 
-                                    min="0" max="100" step="0.1" required
+                                <input type="number" name="score_demo"
+                                    value="{{ old('score_demo', $evaluation->score_demo ?? '') }}" min="0" max="50"
+                                    step="0.1" required class="@error('score_demo') border-red-500 @enderror"
                                     style="width: 100%; padding: 10px; border: 2px solid #e74c3c; border-radius: 5px; text-align: center; font-weight: bold;">
+                                @error('score_demo')
+                                    <span
+                                        style="color: red; font-size: 0.8em; display: block; margin-top: 5px;">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
-                        
-                        <div style="margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center;">
+
+                        <div
+                            style="margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center;">
                             <p style="margin: 0; color: #7f8c8d; font-size: 0.9em;">
-                                La <strong>Calificación Final</strong> se calculará automáticamente según los porcentajes.
+                                La <strong>Calificación Final</strong> es la suma de los tres criterios (Total: 100
+                                pts).
                             </p>
                         </div>
 
@@ -88,9 +104,14 @@
                                 style="display: block; margin-bottom: 8px; font-weight: bold; color: #555;">Retroalimentación
                                 para el Estudiante</label>
                             <textarea name="feedback" rows="6" required
-                                placeholder="Escribe aquí tus comentarios, sugerencias de mejora y observaciones..."
-                                style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; resize: vertical;">{{ old('feedback', $evaluation->feedback) }}</textarea>
+                                placeholder="Escribe aquí tus comentarios, sugerencias de mejora y observaciones (Mínimo 10 caracteres)..."
+                                style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; resize: vertical;"
+                                class="@error('feedback') border-red-500 @enderror">{{ old('feedback', $evaluation->feedback ?? '') }}</textarea>
                             <small style="color: #999;">Este comentario será visible para los estudiantes.</small>
+                            @error('feedback')
+                                <span
+                                    style="color: red; font-size: 0.8em; display: block; margin-top: 5px;">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <button type="submit"

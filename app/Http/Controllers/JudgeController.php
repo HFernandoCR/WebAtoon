@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class JudgeController extends Controller
 {
-    
+
     public function index()
     {
         $projects = Auth::user()->judgedProjects()->paginate(10);
@@ -24,7 +24,7 @@ class JudgeController extends Controller
     public function edit(Project $project)
     {
         $isAssigned = Auth::user()->judgedProjects->contains($project->id);
-        
+
         if (!$isAssigned) {
             abort(403, 'No tienes asignado este proyecto.');
         }
@@ -39,15 +39,16 @@ class JudgeController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        
+
         $request->validate([
-            'score_document' => 'required|numeric|min:0|max:100',
-            'score_presentation' => 'required|numeric|min:0|max:100',
-            'score_demo' => 'required|numeric|min:0|max:100',
+            'score_document' => 'required|numeric|min:0|max:20',
+            'score_presentation' => 'required|numeric|min:0|max:30',
+            'score_demo' => 'required|numeric|min:0|max:50',
             'feedback' => 'required|string|min:10'
         ]);
 
-        if (!Auth::user()->judgedProjects->contains($project->id)) abort(403);
+        if (!Auth::user()->judgedProjects->contains($project->id))
+            abort(403);
 
         $event = $project->event;
         $now = now();
@@ -56,11 +57,10 @@ class JudgeController extends Controller
             return redirect()->back()->with('error', 'No puedes evaluar el proyecto fuera de las fechas del evento.');
         }
 
-        // Calcular promedio ponderado
-        // Documento: 20%, Presentación: 30%, Demo: 50%
-        $finalScore = ($request->score_document * 0.20) + 
-                      ($request->score_presentation * 0.30) + 
-                      ($request->score_demo * 0.50);
+        // Calcular suma total (los inputs ya están ponderados)
+        $finalScore = $request->score_document +
+            $request->score_presentation +
+            $request->score_demo;
 
         Auth::user()->judgedProjects()->updateExistingPivot($project->id, [
             'score' => $finalScore,
@@ -71,17 +71,13 @@ class JudgeController extends Controller
             'updated_at' => now()
         ]);
 
-        Notification::create([
-            'user_id' => $project->user_id,
-            'type' => 'project_evaluated',
-            'title' => 'Proyecto evaluado',
-            'message' => 'El juez ' . Auth::user()->name . ' ha evaluado tu proyecto "' . $project->title . '" con una calificación de ' . $request->score . ' puntos.',
-            'data' => [
-                'project_id' => $project->id,
-                'score' => $request->score,
-            ],
-            'url' => route('projects.show', $project->id),
-        ]);
+        // Enviar notificación al estudiante (Mail + Database)
+        $project->author->notify(new \App\Notifications\ProjectEvaluated(
+            $project,
+            $finalScore,
+            Auth::user()->name,
+            $request->feedback
+        ));
 
         $event = $project->event;
         if ($event && $event->manager_id) {

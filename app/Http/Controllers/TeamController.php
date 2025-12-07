@@ -93,17 +93,8 @@ class TeamController extends Controller
             }
         }
 
-        Notification::create([
-            'user_id' => $userToInvite->id,
-            'type' => 'team_invitation',
-            'title' => 'Invitación a equipo',
-            'message' => Auth::user()->name . ' te ha invitado a unirte al proyecto "' . $project->title . '"',
-            'data' => [
-                'project_id' => $project->id,
-                'membership_id' => $membership->id,
-            ],
-            'url' => route('student.team'),
-        ]);
+        // Usar sistema de notificaciones de Laravel (Mail + Database)
+        $userToInvite->notify(new \App\Notifications\TeamInvitation($project, Auth::user()->name));
 
         return back()->with('success', 'Invitación enviada a ' . $userToInvite->name);
     }
