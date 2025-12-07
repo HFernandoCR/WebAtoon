@@ -5,8 +5,8 @@
         </h2>
     </x-slot>
 
-    <div style="display: flex; min-height: calc(100vh - 65px);">
-        <div style="width: 260px; background-color: #2c3e50; color: white; flex-shrink: 0;">
+    <div style="display: flex; min-height: calc(100vh - 65px);" class="flex-container">
+        <div class="sidebar-container" style="width: 260px; background-color: #2c3e50; color: white; flex-shrink: 0;">
             @include('sidebar')
         </div>
 
