@@ -284,6 +284,10 @@
                                     <td>
                                         @if($project->status == 'approved')
                                             <span class="status-badge status-approved">Aprobado</span>
+                                            <a href="{{ route('certificates.download', ['project_id' => $project->id]) }}"
+                                                style="margin-left: 10px; color: #3498db; text-decoration: none; font-size: 0.9em;">
+                                                <i class="icon-download"></i> Constancia
+                                            </a>
                                         @elseif($project->status == 'rejected')
                                             <span class="status-badge status-pending" style="background: #e74c3c;">Rechazado</span>
                                         @else
@@ -309,36 +313,36 @@
                 <h3>Estado de Mi Proyecto</h3>
 
                 @if(isset($myProject))
-                                <div style="margin-bottom: 15px;">
-                                    <h4 style="color: #2c3e50; font-weight: bold;">{{ $myProject->title }}</h4>
-                                    <p style="color: #7f8c8d;">Evento: <strong>{{ $myProject->event->name ?? 'Sin Asignar' }}</strong>
-                                    </p>
-                                </div>
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="color: #2c3e50; font-weight: bold;">{{ $myProject->title }}</h4>
+                        <p style="color: #7f8c8d;">Evento: <strong>{{ $myProject->event->name ?? 'Sin Asignar' }}</strong>
+                        </p>
+                    </div>
 
-                                <div style="background: #eee; border-radius: 10px; height: 20px; width: 100%; margin: 15px 0;">
-                                    @php
-                                        $progress = 0;
-                                        if ($myProject->status == 'approved')
-                                            $progress = 100;
-                                        elseif ($myProject->status == 'rejected')
-                                            $progress = 100;
-                                        else
-                                            $progress = 50; 
-                                    @endphp
-                     <div
-                                        style="background: {{ $myProject->status == 'rejected' ? '#e74c3c' : '#2ecc71' }}; height: 100%; width: {{ $progress }}%; border-radius: 10px;">
-                                    </div>
-                                </div>
+                    <div style="background: #eee; border-radius: 10px; height: 20px; width: 100%; margin: 15px 0;">
+                        @php
+                            $progress = 0;
+                            if ($myProject->status == 'approved')
+                                $progress = 100;
+                            elseif ($myProject->status == 'rejected')
+                                $progress = 100;
+                            else
+                                $progress = 50; 
+                        @endphp
+                        <div
+                            style="background: {{ $myProject->status == 'rejected' ? '#e74c3c' : '#2ecc71' }}; height: 100%; width: {{ $progress }}%; border-radius: 10px;">
+                        </div>
+                    </div>
 
-                                <p>Estado actual:
-                                    @if($myProject->status == 'approved')
-                                        <span class="status-badge status-approved">Aprobado</span>
-                                    @elseif($myProject->status == 'rejected')
-                                        <span class="status-badge status-pending" style="background: #e74c3c;">Rechazado</span>
-                                    @else
-                                        <span class="status-badge status-pending">En Revisión</span>
-                                    @endif
-                                </p>
+                    <p>Estado actual:
+                        @if($myProject->status == 'approved')
+                            <span class="status-badge status-approved">Aprobado</span>
+                        @elseif($myProject->status == 'rejected')
+                            <span class="status-badge status-pending" style="background: #e74c3c;">Rechazado</span>
+                        @else
+                            <span class="status-badge status-pending">En Revisión</span>
+                        @endif
+                    </p>
                 @else
                     <p style="color: #7f8c8d;">No tienes un proyecto registrado aún.</p>
                     <a href="{{ route('projects.create') }}" class="btn-action" style="margin-top: 10px;">Crear Proyecto</a>
