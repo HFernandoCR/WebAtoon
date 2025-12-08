@@ -28,7 +28,7 @@ class ProjectController extends Controller
     public function create()
     {
         $this->authorize('create', Project::class);
-        $activeEvents = Event::where('status', 'active')
+        $activeEvents = Event::where('status', Event::STATUS_REGISTRATION)
             ->whereDate('start_date', '<=', now())
             ->whereDate('end_date', '>=', now())
             ->get();
@@ -56,6 +56,10 @@ class ProjectController extends Controller
 
         $event = Event::findOrFail($request->event_id);
         $now = now();
+
+        if ($event->status !== Event::STATUS_REGISTRATION) {
+            return back()->withErrors(['event_id' => 'El evento no está en periodo de inscripciones.'])->withInput();
+        }
 
         if ($now < $event->start_date || $now > $event->end_date) {
             return back()->withErrors(['event_id' => 'El evento no está activo en este momento.'])->withInput();
@@ -131,7 +135,7 @@ class ProjectController extends Controller
         $this->authorize('update', $project);
 
 
-        $activeEvents = Event::where('status', 'active')
+        $activeEvents = Event::where('status', Event::STATUS_REGISTRATION)
             ->whereDate('start_date', '<=', now())
             ->whereDate('end_date', '>=', now())
             ->get();

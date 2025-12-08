@@ -21,6 +21,19 @@ class Event extends Model
         'status'
     ];
 
+    const STATUS_REGISTRATION = 'registration';
+    const STATUS_IN_PROGRESS = 'in_progress';
+    const STATUS_FINISHED = 'finished';
+
+    public static function getStatuses()
+    {
+        return [
+            self::STATUS_REGISTRATION => 'En Inscripciones',
+            self::STATUS_IN_PROGRESS => 'En Curso',
+            self::STATUS_FINISHED => 'Finalizado',
+        ];
+    }
+
     /**
      * Relación: Un evento pertenece a un Encargado (User)
      */

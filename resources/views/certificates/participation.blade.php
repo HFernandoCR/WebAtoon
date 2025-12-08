@@ -253,7 +253,9 @@
 
             {{-- Footer (QR Only) --}}
             <div class="footer-info" style="text-align: center; width: 100%; margin-top: 30px;">
-                <img src="data:image/svg+xml;base64, {{ $qrCode }}" alt="QR Code" style="width: 70px; height: 70px;">
+                @if($qrCode)
+                    <img src="data:image/svg+xml;base64, {{ $qrCode }}" alt="QR Code" style="width: 70px; height: 70px;">
+                @endif
             </div>
 
         </div>

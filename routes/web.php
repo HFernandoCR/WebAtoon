@@ -91,6 +91,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/event-management/projects/{project}/add-judge', [EventManagerController::class, 'addJudge'])->name('manager.projects.add_judge')->middleware('throttle:20,1');
         Route::delete('/event-management/projects/{project}/remove-judge/{judgeId}', [EventManagerController::class, 'removeJudge'])->name('manager.projects.remove_judge')->middleware('throttle:20,1');
 
+        // Editar Evento (Status)
+        Route::get('/event-management/edit', [EventManagerController::class, 'editEvent'])->name('manager.event.edit');
+        Route::put('/event-management/update', [EventManagerController::class, 'updateEventStatus'])->name('manager.event.update');
+
     });
 
 

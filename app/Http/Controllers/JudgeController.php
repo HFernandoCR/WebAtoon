@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Event;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,6 +53,10 @@ class JudgeController extends Controller
 
         $event = $project->event;
         $now = now();
+
+        if ($event->status !== Event::STATUS_IN_PROGRESS) {
+            return redirect()->back()->with('error', 'El evento no está en curso. No se pueden realizar evaluaciones.');
+        }
 
         if ($now < $event->start_date || $now > $event->end_date) {
             return redirect()->back()->with('error', 'No puedes evaluar el proyecto fuera de las fechas del evento.');
