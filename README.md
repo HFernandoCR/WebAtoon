@@ -69,6 +69,8 @@ Para configurar el proyecto automáticamente, sigue estos pasos:
 -   **Control de Versiones**: Git
 
   ## Diagrama de Secuencias
+
+  1. Estudiante: Crear Proyecto
   ```mermaid
 sequenceDiagram
     actor Estudiante
