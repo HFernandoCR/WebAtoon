@@ -87,6 +87,11 @@
                 display: block;
             }
         }
+
+        /* Force black text for headers */
+        header h2 {
+            color: black !important;
+        }
     </style>
 
     <button id="sidebarToggle" onclick="toggleSidebar()">
@@ -97,10 +102,10 @@
     <div class="min-h-screen bg-gray-100 flex-container">
         @include('layouts.navigation')
 
-        <!-- Page Heading -->
         @isset($header)
-            <header class="{{ $headerClass ?? 'bg-white' }} shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <header class="{{ $headerClass ?? 'bg-[#d8b4fe]' }} shadow">
+                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex items-center gap-3">
+                    <img src="{{ asset('favicon.ico') }}" alt="Logo" class="h-10 w-10">
                     {{ $header }}
                 </div>
             </header>
