@@ -70,10 +70,11 @@
                         <div>
                             <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600;">Estado del Evento <span style="color:red">*</span></label>
                             <select name="status" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; background: white; cursor: pointer;">
-                                <option value="active" {{ old('status', $event->status) == 'active' ? 'selected' : '' }}>Activo (Público)</option>
-                                <option value="inactive" {{ old('status', $event->status) == 'inactive' ? 'selected' : '' }}>Inactivo (Borrador)</option>
-                                <option value="finished" {{ old('status', $event->status) == 'finished' ? 'selected' : '' }}>Finalizado</option>
-                               
+                                @foreach(App\Models\Event::getStatuses() as $key => $label)
+                                    <option value="{{ $key }}" {{ old('status', $event->status) == $key ? 'selected' : '' }}>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
 

@@ -54,6 +54,10 @@ class DeliverableController extends Controller
         $event = $project->event;
         $now = now();
 
+        if ($event->status !== Event::STATUS_IN_PROGRESS) {
+            return redirect()->back()->with('error', 'El evento no está en curso. No se pueden subir entregables.');
+        }
+
         if ($now < $event->start_date || $now > $event->end_date) {
             return redirect()->back()->with('error', 'No puedes subir entregables fuera de las fechas del evento.');
         }

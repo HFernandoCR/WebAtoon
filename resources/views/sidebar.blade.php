@@ -92,13 +92,20 @@
             </li>
             <li>
                 <a href="{{ route('manager.dashboard') }}"
-                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('manager.*') ? 'bg-white/10 text-white' : '' }}">
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('manager.dashboard') ? 'bg-white/10 text-white' : '' }}">
                     <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
                             class="icon-briefcase"></i></span>
                     Gestión de Proyectos
                 </a>
             </li>
-            <!-- Add other manager links similarly -->
+            <li>
+                <a href="{{ route('manager.event.edit') }}"
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('manager.event.*') ? 'bg-white/10 text-white' : '' }}">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-settings"></i></span>
+                    Editar Evento
+                </a>
+            </li>
             @endrole
 
             @role('judge')

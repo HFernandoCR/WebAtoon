@@ -142,4 +142,28 @@ class EventManagerController extends Controller
 
         return back()->with('success', 'Juez removido del proyecto.');
     }
+
+    // =========================================================
+    //        GESTIÓN DEL EVENTO (STATUS)
+    // =========================================================
+
+    public function editEvent()
+    {
+        $event = Event::where('manager_id', Auth::id())->firstOrFail();
+        
+        return view('Manager.event.edit', compact('event'));
+    }
+
+    public function updateEventStatus(Request $request)
+    {
+        $event = Event::where('manager_id', Auth::id())->firstOrFail();
+
+        $request->validate([
+            'status' => 'required|in:' . Event::STATUS_REGISTRATION . ',' . Event::STATUS_IN_PROGRESS . ',' . Event::STATUS_FINISHED
+        ]);
+
+        $event->update(['status' => $request->status]);
+
+        return redirect()->route('manager.dashboard')->with('success', 'Estado del evento actualizado.');
+    }
 }
