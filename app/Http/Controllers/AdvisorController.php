@@ -11,9 +11,20 @@ class AdvisorController extends Controller
     {
         // Obtener proyectos donde yo soy el advisor_id
         $projects = Auth::user()->advisedProjects()
-                        ->with('event', 'author') // Traer datos del evento y del alumno líder
-                        ->paginate(10);
+            ->with('event', 'author') // Traer datos del evento y del alumno líder
+            ->paginate(10);
 
         return view('Advisor.index', compact('projects'));
+    }
+
+    public function certificates()
+    {
+        // Obtener proyectos aprobados del asesor (solo aprobados generan constancia)
+        $projects = Auth::user()->advisedProjects()
+            ->where('status', 'approved')
+            ->with('event')
+            ->get();
+
+        return view('Advisor.certificates', compact('projects'));
     }
 }

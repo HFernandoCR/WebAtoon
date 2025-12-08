@@ -17,7 +17,7 @@ use App\Http\Controllers\AdvisorController;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -38,6 +38,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // === RANKINGS (Iteración 4) ===
     Route::get('/rankings', [App\Http\Controllers\RankingController::class, 'index'])->name('rankings.index');
     Route::post('/rankings/{event}/recalculate', [App\Http\Controllers\RankingController::class, 'recalculate'])->name('rankings.recalculate')->middleware(['role:admin|event_manager']);
+
+    // === CONSTANCIAS (Iteración 5) ===
+    Route::get('/certificates/download', [App\Http\Controllers\CertificateController::class, 'download'])->name('certificates.download');
 
 
     Route::middleware(['role:admin'])->group(function () {
@@ -109,6 +112,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // === ZONA ASESOR ===
     Route::middleware(['role:advisor'])->group(function () {
         Route::get('/advisor/dashboard', [AdvisorController::class, 'index'])->name('advisor.dashboard');
+        Route::get('/advisor/certificates', [AdvisorController::class, 'certificates'])->name('advisor.certificates');
     });
 
 });

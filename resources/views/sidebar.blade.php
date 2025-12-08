@@ -192,8 +192,14 @@
             <li class="menu-header">Mis Equipos</li>
             <li>
                 <a href="{{ route('advisor.dashboard') }}"
-                    class="nav-link {{ request()->routeIs('advisor.*') ? 'active' : '' }}">
+                    class="nav-link {{ request()->routeIs('advisor.dashboard') ? 'active' : '' }}">
                     <i class="icon-group"></i> Progreso de Estudiantes
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('advisor.certificates') }}"
+                    class="nav-link {{ request()->routeIs('advisor.certificates') ? 'active' : '' }}">
+                    <i class="icon-trophy"></i> Mis Constancias
                 </a>
             </li>
             <li>
