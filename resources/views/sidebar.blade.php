@@ -1,253 +1,205 @@
-<style>
-    .sidebar {
-        padding: 20px;
-    }
-
-    .user-profile {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .user-profile img {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin-bottom: 10px;
-        background: #ddd;
-        display: block;
-        /* Force block to allow margin auto to work */
-        margin-left: auto;
-        margin-right: auto;
-        object-fit: cover;
-        /* Ensure image doesn't stretch */
-    }
-
-    .badge {
-        background: #3498db;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 0.8em;
-    }
-
-    .menu-list ul {
-        list-style: none;
-        padding: 0;
-    }
-
-    .menu-list li {
-        margin-bottom: 10px;
-    }
-
-    .menu-header {
-        color: #95a5a6;
-        font-size: 0.85em;
-        text-transform: uppercase;
-        margin-top: 20px;
-        margin-bottom: 5px;
-        font-weight: bold;
-    }
-
-    .nav-link {
-        color: #ecf0f1;
-        text-decoration: none;
-        display: block;
-        padding: 10px;
-        border-radius: 5px;
-        transition: background 0.3s;
-    }
-
-    .nav-link:hover {
-        background: #34495e;
-    }
-
-    .nav-link.active {
-        background: #34495e;
-        font-weight: bold;
-    }
-
-    .logout-form {
-        margin: 0;
-    }
-
-    .btn-logout {
-        background: none;
-        border: none;
-        width: 100%;
-        text-align: left;
-        cursor: pointer;
-        color: #e74c3c;
-    }
-
-    .btn-logout:hover {
-        background: #c0392b;
-        color: white;
-    }
-
-    .notification-badge {
-        background: #e74c3c;
-        color: white;
-        border-radius: 50%;
-        padding: 2px 6px;
-        font-size: 0.7em;
-        margin-left: 5px;
-        font-weight: bold;
-    }
-
-    .notification-link {
-        position: relative;
-    }
-</style>
-
-<aside class="sidebar">
-    <div class="user-profile">
-        <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : asset('images/default-avatar.svg') }}"
-            alt="User Avatar">
-        <div class="user-info">
-            <h4>{{ Auth::user()->name }}</h4>
-            <span class="badge badge-{{ Auth::user()->getRoleNames()->first() }}">
-                {{ ucfirst(Auth::user()->getRoleNames()->first()) }}
-            </span>
-        </div>
+<aside class="h-full min-h-screen bg-slate-900 text-white flex flex-col p-6 relative overflow-hidden">
+    <!-- Decorative Gradient Overlay -->
+    <div
+        class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-900/20 to-transparent pointer-events-none">
     </div>
 
-    <nav class="menu-list">
-        <ul>
+    <!-- User Profile -->
+    <div class="relative z-10 flex flex-col items-center mb-10 text-center">
+        <div class="mb-3 p-1 rounded-full bg-white/10">
+            <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : asset('images/default-avatar.svg') }}"
+                alt="User Avatar" class="w-20 h-20 rounded-full object-cover border-2 border-white/20">
+        </div>
+        <h4 class="font-medium text-lg tracking-wide">{{ Auth::user()->name }}</h4>
+        <span
+            class="mt-1 px-3 py-0.5 bg-blue-500 text-white text-xs rounded-full uppercase tracking-wider font-semibold">
+            {{ ucfirst(Auth::user()->getRoleNames()->first()) }}
+        </span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="relative z-10 flex-1 overflow-y-auto">
+        <ul class="space-y-1">
             <li>
-                <a href="{{ route('dashboard') }}" class="nav-link">
-                    <i class="icon-home"></i> Inicio / Dashboard
+                <a href="{{ route('dashboard') }}"
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-home"></i></span>
+                    Inicio / Dashboard
                 </a>
             </li>
 
             <li>
-                <a href="{{ route('notifications.index') }}" class="nav-link notification-link">
-                    <i class="icon-bell"></i> Notificaciones
+                <a href="{{ route('notifications.index') }}"
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group relative">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-bell"></i></span>
+                    Notificaciones
                     @php
                         $unreadCount = Auth::user()->unreadNotifications()->count();
                     @endphp
                     @if($unreadCount > 0)
-                        <span class="notification-badge">{{ $unreadCount }}</span>
+                        <span
+                            class="absolute right-3 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ $unreadCount }}</span>
                     @endif
                 </a>
             </li>
 
             <li>
-                <a href="{{ route('rankings.index') }}" class="nav-link">
-                    <i class="icon-trophy"></i> Resultados del Evento
+                <a href="{{ route('rankings.index') }}"
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-trophy"></i></span>
+                    Resultados del Evento
                 </a>
             </li>
 
             @role('admin')
-            <li class="menu-header">Administración</li>
+            <li class="mt-6 mb-2 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                ADMINISTRACIÓN
+                <div class="h-px bg-gray-800 mt-2"></div>
+            </li>
             <li>
                 <a href="{{ route('users.index') }}"
-                    class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                    <i class="icon-users"></i> Gestionar Usuarios
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('users.*') ? 'bg-white/10 text-white' : '' }}">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-users"></i></span>
+                    Gestionar Usuarios
                 </a>
             </li>
             <li>
                 <a href="{{ route('events.index') }}"
-                    class="nav-link {{ request()->routeIs('events.*') ? 'active' : '' }}">
-                    <i class="icon-calendar"></i> Gestionar Eventos
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('events.*') ? 'bg-white/10 text-white' : '' }}">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-calendar"></i></span>
+                    Gestionar Eventos
                 </a>
             </li>
             <li>
                 <a href="{{ route('categories.index') }}"
-                    class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
-                    <i class="icon-list"></i> Gestionar Categorías
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('categories.*') ? 'bg-white/10 text-white' : '' }}">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-list"></i></span>
+                    Gestionar Categorías
                 </a>
             </li>
             @endrole
 
             @role('event_manager')
-            <li class="menu-header">Logística del Evento</li>
+            <li class="mt-6 mb-2 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Logística del Evento
+                <div class="h-px bg-gray-800 mt-2"></div>
+            </li>
             <li>
                 <a href="{{ route('manager.dashboard') }}"
-                    class="nav-link {{ request()->routeIs('manager.*') ? 'active' : '' }}">
-                    <i class="icon-briefcase"></i> Gestión de Proyectos
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('manager.*') ? 'bg-white/10 text-white' : '' }}">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-briefcase"></i></span>
+                    Gestión de Proyectos
                 </a>
             </li>
-            <li>
-                <a href="#" class="nav-link">
-                    <i class="icon-map"></i> Gestión de Salas
-                </a>
-            </li>
+            <!-- Add other manager links similarly -->
             @endrole
 
             @role('judge')
-            <li class="menu-header">Evaluación</li>
+            <li class="mt-6 mb-2 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Evaluación
+                <div class="h-px bg-gray-800 mt-2"></div>
+            </li>
             <li>
                 <a href="{{ route('judge.dashboard') }}"
-                    class="nav-link {{ request()->routeIs('judge.*') ? 'active' : '' }}">
-                    <i class="icon-check"></i> Evaluar Proyectos
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('judge.*') ? 'bg-white/10 text-white' : '' }}">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-check"></i></span>
+                    Evaluar Proyectos
                 </a>
             </li>
-            <li>
-                <a href="#" class="nav-link">
-                    <i class="icon-calendar"></i> Mi Agenda
-                </a>
-            </li>
+            <!-- Add other judge links similarly -->
             @endrole
 
             @role('advisor')
-            <li class="menu-header">Mis Equipos</li>
+            <li class="mt-6 mb-2 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Mis Equipos
+                <div class="h-px bg-gray-800 mt-2"></div>
+            </li>
             <li>
                 <a href="{{ route('advisor.dashboard') }}"
-                    class="nav-link {{ request()->routeIs('advisor.dashboard') ? 'active' : '' }}">
-                    <i class="icon-group"></i> Progreso de Estudiantes
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('advisor.dashboard') ? 'bg-white/10 text-white' : '' }}">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-group"></i></span>
+                    Progreso de Estudiantes
                 </a>
             </li>
             <li>
                 <a href="{{ route('advisor.certificates') }}"
-                    class="nav-link {{ request()->routeIs('advisor.certificates') ? 'active' : '' }}">
-                    <i class="icon-trophy"></i> Mis Constancias
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('advisor.certificates') ? 'bg-white/10 text-white' : '' }}">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-trophy"></i></span>
+                    Mis Constancias
                 </a>
             </li>
-            <li>
-                <a href="#" class="nav-link">
-                    <i class="icon-plus"></i> (Opcional) Registrar Proyecto
-                </a>
-            </li>
+            <!-- Add other advisor links similarly -->
             @endrole
 
             @role('student')
-            <li class="menu-header">Mi Competencia</li>
+            <li class="mt-6 mb-2 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Mi Competencia
+                <div class="h-px bg-gray-800 mt-2"></div>
+            </li>
             <li>
                 <a href="{{ route('projects.index') }}"
-                    class="nav-link {{ request()->routeIs('projects.*') ? 'active' : '' }}">
-                    <i class="icon-folder"></i> Mis Proyectos
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('projects.*') ? 'bg-white/10 text-white' : '' }}">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-folder"></i></span>
+                    Mis Proyectos
                 </a>
             </li>
             <li>
                 <a href="{{ route('student.team') }}"
-                    class="nav-link {{ request()->routeIs('student.team') ? 'active' : '' }}">
-                    <i class="icon-group"></i> Mi Equipo
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('student.team') ? 'bg-white/10 text-white' : '' }}">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-group"></i></span>
+                    Mi Equipo
                 </a>
             </li>
             <li>
                 <a href="{{ route('deliverables.index') }}"
-                    class="nav-link {{ request()->routeIs('deliverables.*') ? 'active' : '' }}">
-                    <i class="icon-upload"></i> Entregables
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('deliverables.*') ? 'bg-white/10 text-white' : '' }}">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-upload"></i></span>
+                    Entregables
                 </a>
             </li>
             <li>
                 <a href="{{ route('student.certificates') }}"
-                    class="nav-link {{ request()->routeIs('student.certificates') ? 'active' : '' }}">
-                    <i class="icon-trophy"></i> Constancias
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group {{ request()->routeIs('student.certificates') ? 'bg-white/10 text-white' : '' }}">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-trophy"></i></span>
+                    Constancias
                 </a>
             </li>
             @endrole
 
-            <li class="menu-header">Cuenta</li>
+            <li class="mt-6 mb-2 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                CUENTA
+                <div class="h-px bg-gray-800 mt-2"></div>
+            </li>
             <li>
-                <a href="{{ route('profile.edit') }}" class="nav-link">
-                    <i class="icon-user"></i> Mi Perfil
+                <a href="{{ route('profile.edit') }}"
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-user"></i></span>
+                    Mi Perfil
                 </a>
             </li>
             <li>
-                <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="nav-link btn-logout">
-                        <i class="icon-logout"></i> Cerrar Sesión
+                    <button type="submit"
+                        class="w-full flex items-center px-4 py-3 text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors group text-left">
+                        <span class="mr-3 text-red-500/70 group-hover:text-red-400 max-w-[20px] text-center"><i
+                                class="icon-logout"></i></span>
+                        Cerrar Sesión
                     </button>
                 </form>
             </li>
