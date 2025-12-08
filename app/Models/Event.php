@@ -46,4 +46,20 @@ class Event extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    /**
+     * Scope a query to only include active events (Registration or In Progress).
+     */
+    public function scopeActive($query)
+    {
+        return $query->whereIn('status', [self::STATUS_REGISTRATION, self::STATUS_IN_PROGRESS]);
+    }
+
+    /**
+     * Scope a query to only include finished events.
+     */
+    public function scopeFinished($query)
+    {
+        return $query->where('status', self::STATUS_FINISHED);
+    }
 }

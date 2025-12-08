@@ -49,7 +49,7 @@
                             <a href="{{ route('manager.dashboard') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">
                                 Cancelar
                             </a>
-                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+                            <button type="submit" id="saveButton" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
                                 Guardar Cambios
                             </button>
                         </div>
@@ -58,4 +58,21 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('saveButton').addEventListener('click', function(e) {
+            const statusSelect = document.getElementById('status');
+            const selectedValue = statusSelect.value;
+            // Assuming 'finished' is the key for finished status. Verify with Event model constants.
+            // In the view loop: value="{{ $key }}"
+            // Event::STATUS_FINISHED = 'finished'
+
+            if (selectedValue === 'finished') {
+                e.preventDefault();
+                if (confirm('¿Estás seguro de que deseas finalizar el evento? Una vez finalizado, ya no aparecerá en tu panel de gestión ni en el de los jueces/estudiantes hasta que (si aplica) se reactive.')) {
+                    e.target.closest('form').submit();
+                }
+            }
+        });
+    </script>
 </x-app-layout>
