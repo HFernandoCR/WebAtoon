@@ -68,5 +68,130 @@ Para configurar el proyecto automáticamente, sigue estos pasos:
 -   **Base de Datos**: MySQL
 -   **Control de Versiones**: Git
 
+  ## Diagrama de Secuencias
+  ```mermaid
+sequenceDiagram
+    actor Estudiante
+    participant ProjectController
+    participant Modelo Evento
+    participant Modelo Proyecto
+    participant Modelo Notificacion
+    participant BaseDeDatos
+    Estudiante->>ProjectController: POST /projects (store)
+    ProjectController->>Modelo Evento: findOrFail(event_id)
+    Modelo Evento-->>ProjectController: Datos del Evento
+    
+    ProjectController->>ProjectController: Validar Fecha (start_date <= hoy <= end_date)
+    
+    alt Fecha Inválida
+        ProjectController-->>Estudiante: Error: El evento no está activo
+    else Fecha Válida
+        ProjectController->>Modelo Proyecto: create(datos)
+        Modelo Proyecto->>BaseDeDatos: Insertar Proyecto
+        BaseDeDatos-->>Modelo Proyecto: Proyecto Creado
+        
+        par Notificar Gestor de Eventos
+            ProjectController->>Modelo Notificacion: create(nuevo_proyecto_registrado)
+        and Notificar Asesor (si fue seleccionado)
+            ProjectController->>Modelo Notificacion: create(asesor_asignado)
+        and Notificar Administradores
+            ProjectController->>Modelo Notificacion: create(nuevo_proyecto)
+        end
+        
+        ProjectController-->>Estudiante: Redirigir a Índice (Éxito)
+    end
+```
+2. Estudiante: Invitar Miembro al Equipo
+```mermaid
+sequenceDiagram
+    actor Lider as Estudiante (Líder)
+    participant TeamController
+    participant Modelo Proyecto
+    participant Modelo ProjectMember
+    participant Modelo Usuario
+    participant Sistema Notificaciones
+    Lider->>TeamController: POST /team/invite (email)
+    TeamController->>Modelo Proyecto: Obtener Proyecto del Líder
+    
+    rect rgb(240, 240, 240)
+        note right of TeamController: Validaciones
+        TeamController->>Modelo ProjectMember: Contar miembros aceptados
+        TeamController->>Modelo Usuario: Buscar usuario por email (rol: estudiante)
+        TeamController->>Modelo Proyecto: Verificar si el invitado ya lidera un proyecto
+        TeamController->>Modelo ProjectMember: Verificar si el invitado ya está en otro equipo
+    end
+    alt Validación Falla
+        TeamController-->>Lider: Mensaje de Error
+    else Validación Exitosa
+        TeamController->>Modelo ProjectMember: firstOrCreate(status: pendiente)
+        Modelo ProjectMember->>Sistema Notificaciones: Enviar Notificación (Email/BD)
+        Sistema Notificaciones-->>Modelo Usuario (Invitado): Recibir Invitación
+        TeamController-->>Lider: Mensaje de Éxito
+    end
+```
+3. Gestor de Eventos: Asignar Juez
+```mermaid
+sequenceDiagram
+    actor Gestor as Gestor de Eventos
+    participant EventManagerController
+    participant Modelo Evento
+    participant Modelo Usuario (Juez)
+    participant Modelo Proyecto
+    participant Modelo Notificacion
+    Gestor->>EventManagerController: POST /projects/{id}/add-judge
+    EventManagerController->>Modelo Evento: Verificar que el Gestor sea dueño del Evento
+    
+    alt No es Dueño
+        EventManagerController-->>Gestor: 403 Prohibido
+    else Es Dueño
+        EventManagerController->>Modelo Usuario (Juez): Verificar rol 'judge'
+        
+        alt Rol Inválido
+            EventManagerController-->>Gestor: Error: El usuario no es juez
+        else Rol Válido
+            EventManagerController->>Modelo Proyecto: judges()->syncWithoutDetaching()
+            Modelo Proyecto->>BaseDeDatos: Vincular Juez al Proyecto
+            
+            EventManagerController->>Modelo Notificacion: create(asignacion_juez)
+            Modelo Notificacion-->>Modelo Usuario (Juez): Notificar Juez
+            
+            EventManagerController-->>Gestor: Mensaje de Éxito
+        end
+    end
+```
+4. Juez: Evaluar Proyecto
+```mermaid
+sequenceDiagram
+    actor Juez
+    participant JudgeController
+    participant Modelo Proyecto
+    participant Tabla Pivote (project_judge)
+    participant ServicioRanking
+    participant Modelo Notificacion
+    Juez->>JudgeController: POST /judge/evaluate/{id}
+    JudgeController->>Modelo Proyecto: Verificar Asignación
+    
+    alt No Asignado
+        JudgeController-->>Juez: 403 Prohibido
+    else Asignado
+        JudgeController->>JudgeController: Validar Puntajes y Fecha
+        JudgeController->>JudgeController: Calcular Puntaje Final
+        
+        JudgeController->>Tabla Pivote (project_judge): updateExistingPivot(puntajes, feedback)
+        
+        JudgeController->>Modelo Proyecto: Notificar Estudiante (ProyectoEvaluado)
+        
+        rect rgb(230, 245, 255)
+            note right of JudgeController: Actualización de Ranking
+            JudgeController->>ServicioRanking: calculateProjectAverage(proyecto)
+            JudgeController->>ServicioRanking: updateEventRankings(event_id)
+        end
+        
+        JudgeController->>Modelo Notificacion: Notificar Gestor de Eventos
+        
+        JudgeController-->>Juez: Redirigir a Dashboard (Éxito)
+    end
+```
+
 ---
-© 2025 WebAtoon. Todos los derechos reservados
+© 2025 WebAtoon. Todos los derechos reservados.
