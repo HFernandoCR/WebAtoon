@@ -74,7 +74,10 @@ class CertificateController extends Controller
 
         // Generar QR en formato SVG (base64 para incrustar)
         // Usamos SVG para no depender de la extensión ImageMagick
-        $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(100)->generate($validationUrl));
+        $qrCode = '';
+        if (class_exists(\SimpleSoftwareIO\QrCode\Facades\QrCode::class)) {
+            $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(100)->generate($validationUrl));
+        }
 
         $data = [
             'studentName' => strtoupper($user->name),
