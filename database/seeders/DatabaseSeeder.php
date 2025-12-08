@@ -15,11 +15,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // 1. Crear Roles y Permisos
+        $this->call(RoleSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // 2. Crear Usuario Administrador por defecto
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@webatoon.com'],
+            [
+                'name' => 'Administrador WebAtoon',
+                'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        $admin->assignRole('admin');
     }
 }
