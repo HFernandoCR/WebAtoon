@@ -236,9 +236,28 @@ class ProjectController extends Controller
 
     public function certificates()
     {
-        $project = Project::where('user_id', Auth::id())->first();
-
-        return view('Student.certificates', compact('project'));
+        // Fetch ALL projects where the user is an author or member
+        // And where criteria is met (Approved OR Graded)
+        // User asked: "se le este agregando las nuevas cuando se le califique su proyecto"
+        // So we filter based on status 'approved' OR having a score.
+        // Actually, let's just fetch all and let the view filter/show locked states if we want, 
+        // OR filtering here is cleaner.
+        // Let's filter here: Projects that are Approved OR have a score.
+        
+        $projects = Project::where(function($q) {
+                $q->where('user_id', Auth::id())
+                  ->orWhereHas('members', function($m) {
+                      $m->where('user_id', Auth::id())->where('status', 'accepted');
+                  });
+            })
+            ->with(['event', 'judges'])
+            ->get();
+            
+        // We will filter visible certificates in the view or here.
+        // Let's pass all projects so we can show "Pending" or "Locked" states if we want, 
+        // but user just said "show all".
+        
+        return view('Student.certificates', compact('projects'));
     }
 
 
