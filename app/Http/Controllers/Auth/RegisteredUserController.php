@@ -41,6 +41,8 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        $user->assignRole('Student');
+
         // Notify Admins
         $admins = User::role('admin')->get();
         foreach ($admins as $admin) {
