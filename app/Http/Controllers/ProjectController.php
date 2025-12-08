@@ -28,7 +28,19 @@ class ProjectController extends Controller
     public function create()
     {
         $this->authorize('create', Project::class);
-        $activeEvents = Event::where('status', Event::STATUS_REGISTRATION)
+
+        // Check for existing active projects
+        $existingActiveProject = Project::where('user_id', Auth::id())
+            ->whereHas('event', function ($query) {
+                $query->active();
+            })
+            ->first();
+
+        if ($existingActiveProject) {
+            return redirect()->route('projects.index')->with('error', 'Ya tienes un proyecto activo (' . $existingActiveProject->title . '). No puedes registrar otro hasta que el evento finalice.');
+        }
+
+        $activeEvents = Event::active()
             ->whereDate('start_date', '<=', now())
             ->whereDate('end_date', '>=', now())
             ->get();
@@ -56,6 +68,17 @@ class ProjectController extends Controller
 
         $event = Event::findOrFail($request->event_id);
         $now = now();
+
+        // Check for existing active projects (where event is not finished)
+        $existingActiveProject = Project::where('user_id', Auth::id())
+            ->whereHas('event', function ($query) {
+                $query->active(); // Scope defined in Event model (registration or in_progress)
+            })
+            ->first();
+
+        if ($existingActiveProject) {
+            return back()->withErrors(['error' => 'Ya tienes un proyecto activo en curso. Solo puedes registrar un nuevo proyecto cuando el evento actual haya finalizado.']);
+        }
 
         if ($event->status !== Event::STATUS_REGISTRATION) {
             return back()->withErrors(['event_id' => 'El evento no está en periodo de inscripciones.'])->withInput();
@@ -199,7 +222,15 @@ class ProjectController extends Controller
 
     public function myTeam()
     {
-        $project = Project::where('user_id', Auth::id())->with('event')->first();
+        // Prioritize ACTIVE project.
+        // If the student has a finished project but no active one, we show NOTHING (or handle in view).
+        // The user specifically requested: "haz que cuando un equipo de un proyecto finalizado ya no salga"
+        $project = Project::where('user_id', Auth::id())
+            ->whereHas('event', function ($query) {
+                $query->active();
+            })
+            ->first();
+
         return view('Student.team', compact('project'));
     }
 

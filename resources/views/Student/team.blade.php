@@ -26,7 +26,7 @@
             @if($myProject)
                 <div style="background: white; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
                     <h3 style="font-weight: bold; font-size: 1.2rem; color: #2c3e50; margin-bottom: 10px;">
-                        Mi Equipo: {{ $myProject->title }}
+                        Mi Equipo
                     </h3>
                     <p style="color: #7f8c8d; margin-bottom: 20px;">
                         Integrantes: {{ $myProject->acceptedMembers->count() + 1 }} / 5

@@ -13,11 +13,19 @@ class DeliverableController extends Controller
 {
     public function index()
     {
-        // 1. Buscamos el proyecto del estudiante actual
-        $project = Project::where('user_id', Auth::id())->first();
+        // 1. Buscamos el proyecto ACTIVO del estudiante actual
+        $project = Project::where('user_id', Auth::id())
+             ->whereHas('event', function ($query) {
+                $query->active();
+            })
+            ->first();
 
         if (!$project) {
-            return redirect()->route('projects.create')->with('error', 'Primero debes inscribir un proyecto.');
+            // If no active project, user shouldn't be uploading deliverables usually.
+            // But maybe they want to see old deliverables?
+            // The request was "deliverables now belong to the active project".
+            // So if no active project, we redirect or show empty.
+            return redirect()->route('projects.index')->with('error', 'No tienes un proyecto activo para subir entregables.');
         }
 
         // 2. Buscamos los entregables de ese proyecto

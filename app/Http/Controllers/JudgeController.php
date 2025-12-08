@@ -14,7 +14,11 @@ class JudgeController extends Controller
 
     public function index()
     {
-        $projects = Auth::user()->judgedProjects()->paginate(10);
+        $projects = Auth::user()->judgedProjects()
+            ->whereHas('event', function ($query) {
+                $query->active();
+            })
+            ->paginate(10);
 
         return view('Judge.index', compact('projects'));
     }
@@ -48,8 +52,12 @@ class JudgeController extends Controller
             'feedback' => 'required|string|min:10'
         ]);
 
-        if (!Auth::user()->judgedProjects->contains($project->id))
-            abort(403);
+        // Check if user is assigned to this project
+        $isAssigned = Auth::user()->judgedProjects()->where('project_id', $project->id)->exists();
+
+        if (!$isAssigned) {
+            abort(403, 'No tienes asignado este proyecto.');
+        }
 
         $event = $project->event;
         $now = now();

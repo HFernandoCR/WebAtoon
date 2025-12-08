@@ -10,6 +10,19 @@
 
         <div style="flex: 1; padding: 30px; background-color: #f3f4f6;">
 
+            <div style="max-width: 800px; margin: 0 auto;">
+                @if(session('success'))
+                    <div style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                        {{ session('success') }}
+                    </div>
+                @endif
+                @if(session('error'))
+                    <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                        {{ session('error') }}
+                    </div>
+                @endif
+            </div>
+
             <div style="max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
 
                 <div style="background: white; padding: 30px; border-radius: 10px; height: fit-content;">
