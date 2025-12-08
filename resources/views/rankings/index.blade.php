@@ -48,6 +48,18 @@
                 </div>
             @endif
 
+            {{-- Botones de Exportación --}}
+            @hasanyrole('admin|event_manager')
+            <div style="margin-bottom: 20px; text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
+                <a href="{{ route('reports.excel', $event->id) }}" style="background: #27ae60; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                    <i class="fas fa-file-excel"></i> Exportar Excel
+                </a>
+                <a href="{{ route('reports.pdf', $event->id) }}" style="background: #e74c3c; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                </a>
+            </div>
+            @endhasanyrole
+
             {{-- PODIO (Top 3) --}}
             @if($topThree->count() > 0)
                 <div style="display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-bottom: 50px; height: 350px;">

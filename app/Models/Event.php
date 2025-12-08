@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model; 
+use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
 class Event extends Model
@@ -61,5 +61,13 @@ class Event extends Model
     public function scopeFinished($query)
     {
         return $query->where('status', self::STATUS_FINISHED);
+    }
+
+    /**
+     * Relación: Un evento tiene muchos proyectos
+     */
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
     }
 }

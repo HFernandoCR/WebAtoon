@@ -39,6 +39,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/rankings', [App\Http\Controllers\RankingController::class, 'index'])->name('rankings.index');
     Route::post('/rankings/{event}/recalculate', [App\Http\Controllers\RankingController::class, 'recalculate'])->name('rankings.recalculate')->middleware(['role:admin|event_manager']);
 
+    // === REPORTES (Iteración Extra) ===
+    Route::middleware(['role:admin|event_manager'])->group(function () {
+        Route::get('/reports/{event}/excel', [App\Http\Controllers\ReportController::class, 'exportExcel'])->name('reports.excel');
+        Route::get('/reports/{event}/pdf', [App\Http\Controllers\ReportController::class, 'exportPdf'])->name('reports.pdf');
+    });
+
     // === CONSTANCIAS (Iteración 5) ===
     Route::get('/certificates/download', [App\Http\Controllers\CertificateController::class, 'download'])->name('certificates.download');
 
