@@ -29,12 +29,27 @@ class CertificateController extends Controller
                 $project = Project::where('advisor_id', $user->id)->first();
             }
         } else {
-            // Estudiante (Lógica original)
-            $project = Project::where('user_id', $user->id)
-                ->orWhereHas('members', function ($q) use ($user) {
-                    $q->where('user_id', $user->id);
-                })
-                ->first();
+            // Estudiante (Lógica mejorada)
+            $projectId = $request->query('project_id');
+
+            if ($projectId) {
+                // Verify owner or member
+                $project = Project::where('id', $projectId)
+                    ->where(function($q) use ($user) {
+                        $q->where('user_id', $user->id)
+                          ->orWhereHas('members', function ($m) use ($user) {
+                              $m->where('user_id', $user->id);
+                          });
+                    })
+                    ->first();
+            } else {
+                // Fallback to first if none specified (or show all? No, download is single)
+                $project = Project::where('user_id', $user->id)
+                    ->orWhereHas('members', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    })
+                    ->first();
+            }
         }
 
         if (!$project) {
