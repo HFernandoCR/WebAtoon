@@ -21,6 +21,19 @@ class Event extends Model
         'status'
     ];
 
+    const STATUS_REGISTRATION = 'registration';
+    const STATUS_IN_PROGRESS = 'in_progress';
+    const STATUS_FINISHED = 'finished';
+
+    public static function getStatuses()
+    {
+        return [
+            self::STATUS_REGISTRATION => 'En Inscripciones',
+            self::STATUS_IN_PROGRESS => 'En Curso',
+            self::STATUS_FINISHED => 'Finalizado',
+        ];
+    }
+
     /**
      * Relación: Un evento pertenece a un Encargado (User)
      */
@@ -32,6 +45,22 @@ class Event extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Scope a query to only include active events (Registration or In Progress).
+     */
+    public function scopeActive($query)
+    {
+        return $query->whereIn('status', [self::STATUS_REGISTRATION, self::STATUS_IN_PROGRESS]);
+    }
+
+    /**
+     * Scope a query to only include finished events.
+     */
+    public function scopeFinished($query)
+    {
+        return $query->where('status', self::STATUS_FINISHED);
     }
 
     /**

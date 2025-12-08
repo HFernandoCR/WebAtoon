@@ -34,7 +34,7 @@ class EventController extends Controller
             'category_id' => 'nullable|exists:categories,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'status' => 'required'
+            'status' => 'required|in:' . Event::STATUS_REGISTRATION . ',' . Event::STATUS_IN_PROGRESS . ',' . Event::STATUS_FINISHED
         ]);
 
         $manager = User::find($request->input('manager_id'));
@@ -42,9 +42,9 @@ class EventController extends Controller
             return back()->withErrors(['manager_id' => 'El usuario seleccionado no tiene el rol de Gestor de Eventos.'])->withInput();
         }
 
-        $existingEvent = Event::where('manager_id', $manager->id)->first();
+        $existingEvent = Event::where('manager_id', $manager->id)->active()->first();
         if ($existingEvent) {
-            return back()->withErrors(['manager_id' => 'Este gestor ya tiene un evento asignado: "' . $existingEvent->name . '". Un gestor solo puede administrar un evento a la vez.'])->withInput();
+            return back()->withErrors(['manager_id' => 'Este gestor ya tiene un evento activo asignado: "' . $existingEvent->name . '". Un gestor solo puede administrar un evento activo a la vez.'])->withInput();
         }
 
         $event = Event::create($request->all());
@@ -89,9 +89,9 @@ class EventController extends Controller
         $oldManagerId = $event->manager_id;
 
         if ($oldManagerId != $manager->id) {
-            $existingEvent = Event::where('manager_id', $manager->id)->first();
+            $existingEvent = Event::where('manager_id', $manager->id)->active()->first();
             if ($existingEvent) {
-                return back()->withErrors(['manager_id' => 'Este gestor ya tiene un evento asignado: "' . $existingEvent->name . '". Un gestor solo puede administrar un evento a la vez.'])->withInput();
+                return back()->withErrors(['manager_id' => 'Este gestor ya tiene un evento activo asignado: "' . $existingEvent->name . '". Un gestor solo puede administrar un evento activo a la vez.'])->withInput();
             }
         }
 

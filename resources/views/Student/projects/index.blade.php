@@ -10,13 +10,21 @@
 
         <div style="flex: 1; padding: 30px; background-color: #f3f4f6;">
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="font-size: 1.5rem; font-weight: bold; color: #2c3e50;">Mis Proyectos Inscritos</h3>
-                <a href="{{ route('projects.create') }}"
-                    style="background-color: #2ecc71; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
-                    🚀 Inscribir Nuevo Proyecto
-                </a>
-            </div>
+                @php
+                    // Check if student has any active project
+                    $hasActiveProject = $projects->contains(function ($project) {
+                        return $project->event && in_array($project->event->status, [App\Models\Event::STATUS_REGISTRATION, App\Models\Event::STATUS_IN_PROGRESS]);
+                    });
+                @endphp
+
+                @if(!$hasActiveProject)
+                <div style="text-align: right; margin-bottom: 20px;">
+                    <a href="{{ route('projects.create') }}"
+                        style="background-color: #2ecc71; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                        🚀 Inscribir Nuevo Proyecto
+                    </a>
+                </div>
+                @endif
 
             @if(session('success'))
                 <div
@@ -92,14 +100,18 @@
                                 </td>
                                 <td style="padding: 15px;">
                                     @php
-                                        $statusColor = match ($project->status) {
-                                            'approved' => '#2ecc71',
-                                            'rejected' => '#e74c3c',
+                                        $isEventFinished = $project->event->status === \App\Models\Event::STATUS_FINISHED;
+
+                                        $statusColor = match (true) {
+                                            $isEventFinished => '#95a5a6', // Gray for finished
+                                            $project->status === 'approved' => '#2ecc71',
+                                            $project->status === 'rejected' => '#e74c3c',
                                             default => '#f1c40f',
                                         };
-                                        $statusLabel = match ($project->status) {
-                                            'approved' => 'Aprobado',
-                                            'rejected' => 'Rechazado',
+                                        $statusLabel = match (true) {
+                                            $isEventFinished => 'Finalizado',
+                                            $project->status === 'approved' => 'Aprobado',
+                                            $project->status === 'rejected' => 'Rechazado',
                                             default => 'En Revisión',
                                         };
                                     @endphp

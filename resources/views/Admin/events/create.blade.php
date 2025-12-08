@@ -78,8 +78,11 @@
                     <div style="margin-bottom: 15px;">
                         <label>Estado</label>
                         <select name="status" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                            <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Activo</option>
-                            <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactivo (Borrador)</option>
+                            @foreach(App\Models\Event::getStatuses() as $key => $label)
+                                <option value="{{ $key }}" {{ old('status', 'registration') == $key ? 'selected' : '' }}>
+                                    {{ $label }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 

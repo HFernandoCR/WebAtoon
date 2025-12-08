@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Deliverable;
 use App\Models\Project;
+use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -12,11 +13,19 @@ class DeliverableController extends Controller
 {
     public function index()
     {
-        // 1. Buscamos el proyecto del estudiante actual
-        $project = Project::where('user_id', Auth::id())->first();
+        // 1. Buscamos el proyecto ACTIVO del estudiante actual
+        $project = Project::where('user_id', Auth::id())
+             ->whereHas('event', function ($query) {
+                $query->active();
+            })
+            ->first();
 
         if (!$project) {
-            return redirect()->route('projects.create')->with('error', 'Primero debes inscribir un proyecto.');
+            // If no active project, user shouldn't be uploading deliverables usually.
+            // But maybe they want to see old deliverables?
+            // The request was "deliverables now belong to the active project".
+            // So if no active project, we redirect or show empty.
+            return redirect()->route('projects.index')->with('error', 'No tienes un proyecto activo para subir entregables.');
         }
 
         // 2. Buscamos los entregables de ese proyecto
@@ -53,6 +62,10 @@ class DeliverableController extends Controller
 
         $event = $project->event;
         $now = now();
+
+        if ($event->status !== Event::STATUS_IN_PROGRESS) {
+            return redirect()->back()->with('error', 'El evento no está en curso. No se pueden subir entregables.');
+        }
 
         if ($now < $event->start_date || $now > $event->end_date) {
             return redirect()->back()->with('error', 'No puedes subir entregables fuera de las fechas del evento.');

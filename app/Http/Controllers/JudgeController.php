@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Event;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,11 @@ class JudgeController extends Controller
 
     public function index()
     {
-        $projects = Auth::user()->judgedProjects()->paginate(10);
+        $projects = Auth::user()->judgedProjects()
+            ->whereHas('event', function ($query) {
+                $query->active();
+            })
+            ->paginate(10);
 
         return view('Judge.index', compact('projects'));
     }
@@ -47,11 +52,19 @@ class JudgeController extends Controller
             'feedback' => 'required|string|min:10'
         ]);
 
-        if (!Auth::user()->judgedProjects->contains($project->id))
-            abort(403);
+        // Check if user is assigned to this project
+        $isAssigned = Auth::user()->judgedProjects()->where('project_id', $project->id)->exists();
+
+        if (!$isAssigned) {
+            abort(403, 'No tienes asignado este proyecto.');
+        }
 
         $event = $project->event;
         $now = now();
+
+        if ($event->status !== Event::STATUS_IN_PROGRESS) {
+            return redirect()->back()->with('error', 'El evento no está en curso. No se pueden realizar evaluaciones.');
+        }
 
         if ($now < $event->start_date || $now > $event->end_date) {
             return redirect()->back()->with('error', 'No puedes evaluar el proyecto fuera de las fechas del evento.');

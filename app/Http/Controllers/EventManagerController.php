@@ -17,10 +17,15 @@ class EventManagerController extends Controller
      */
     public function index()
     {
-        // 1. Identificar qué evento administra este usuario
-        $event = Event::where('manager_id', Auth::id())->first();
+        // 1. Identificar qué evento administra este usuario (solo activos)
+        $event = Event::where('manager_id', Auth::id())->active()->first();
 
         if (!$event) {
+            // Check if they have a finished event
+            $finishedEvent = Event::where('manager_id', Auth::id())->finished()->first();
+            if ($finishedEvent) {
+                 return view('Manager.event-finished', ['event' => $finishedEvent]);
+            }
             return view('Manager.no-event');
         }
 
@@ -77,16 +82,35 @@ class EventManagerController extends Controller
 
     public function assignJudgesView(Project $project)
     {
-        $event = Event::where('manager_id', Auth::id())->first();
-
-        if (!$event || $project->event_id !== $event->id) {
+        // 1. Verify manager owns the event of this project
+        if ($project->event->manager_id !== Auth::id()) {
             abort(403, 'No tienes permiso para gestionar este proyecto.');
+        }
+
+        // 2. Prevent editing if event is finished
+        if ($project->event->status === Event::STATUS_FINISHED) {
+             abort(403, 'El evento ha finalizado. No se pueden asignar jueces.');
         }
 
         $this->authorize('update', $project->event);
 
-        $allJudges = User::role('judge')->get();
+        // Filter judges: Only show judges who are NOT assigned to any ACTIVE project
+        // Note: We exclude the current project's assignments from 'available' naturally via diff, 
+        // but we mainly want to exclude judges busy with OTHER active projects.
+        $allJudges = User::role('judge')
+            ->whereDoesntHave('judgedProjects', function($query) {
+                // Check if they have any project that belongs to an ACTIVE event
+                $query->whereHas('event', function($q) {
+                    $q->active();
+                });
+            })
+            ->get();
+
         $assignedJudges = $project->judges;
+        
+        // Available = Valid Judges minus those already assigned to THIS project
+        // (The query above already filtered out judges busy with *other* active projects. 
+        // If a judge is assigned to *this* project (which is active), they are 'busy' but also 'assigned', so they appear in assigned list)
         $availableJudges = $allJudges->diff($assignedJudges);
 
         return view('Manager.assign-judges', compact('project', 'assignedJudges', 'availableJudges'));
@@ -94,10 +118,12 @@ class EventManagerController extends Controller
 
     public function addJudge(Request $request, Project $project)
     {
-        $event = Event::where('manager_id', Auth::id())->first();
-
-        if (!$event || $project->event_id !== $event->id) {
+        if ($project->event->manager_id !== Auth::id()) {
             abort(403, 'No tienes permiso para gestionar este proyecto.');
+        }
+
+        if ($project->event->status === Event::STATUS_FINISHED) {
+             abort(403, 'El evento ha finalizado. No se pueden asignar jueces.');
         }
 
         $this->authorize('update', $project->event);
@@ -109,6 +135,17 @@ class EventManagerController extends Controller
         $judge = User::find($request->judge_id);
         if (!$judge->hasRole('judge')) {
             return back()->with('error', 'El usuario seleccionado no tiene rol de Juez.');
+        }
+
+        // Validate Judge Availability
+        $isBusy = $judge->judgedProjects()
+            ->whereHas('event', function($q) {
+                $q->active();
+            })
+            ->exists();
+
+        if ($isBusy) {
+            return back()->with('error', 'El juez seleccionado ya está evaluando un proyecto en un evento activo. Debe finalizar su asignación actual antes de tomar otro.');
         }
 
         $project->judges()->syncWithoutDetaching([$request->judge_id]);
@@ -130,10 +167,12 @@ class EventManagerController extends Controller
 
     public function removeJudge(Project $project, $judgeId)
     {
-        $event = Event::where('manager_id', Auth::id())->first();
-
-        if (!$event || $project->event_id !== $event->id) {
+        if ($project->event->manager_id !== Auth::id()) {
             abort(403, 'No tienes permiso para gestionar este proyecto.');
+        }
+
+        if ($project->event->status === Event::STATUS_FINISHED) {
+             abort(403, 'El evento ha finalizado. No se pueden remover jueces.');
         }
 
         $this->authorize('update', $project->event);
@@ -141,5 +180,50 @@ class EventManagerController extends Controller
         $project->judges()->detach($judgeId);
 
         return back()->with('success', 'Juez removido del proyecto.');
+    }
+
+    // =========================================================
+    //        GESTIÓN DEL EVENTO (STATUS)
+    // =========================================================
+
+    public function editEvent()
+    {
+        // Prioritize ACTIVE event
+        $event = Event::where('manager_id', Auth::id())->active()->first();
+
+        if (!$event) {
+            // If no active event, check if there is a finished one to show the read-only view
+            $finishedEvent = Event::where('manager_id', Auth::id())->finished()->first();
+            if ($finishedEvent) {
+                 return view('Manager.event-finished', ['event' => $finishedEvent]);
+            }
+            return redirect()->route('manager.dashboard')->with('error', 'No tienes eventos asignados.');
+        }
+        
+        return view('Manager.event.edit', compact('event'));
+    }
+
+    public function updateEventStatus(Request $request)
+    {
+        // Prioritize ACTIVE event
+        $event = Event::where('manager_id', Auth::id())->active()->first();
+
+        // Safety check: if they somehow posted to update a finished event (should be blocked by view, but distinct check here)
+        if (!$event) {
+             // Check if they are trying to update a finished event
+             $finishedEvent = Event::where('manager_id', Auth::id())->finished()->first();
+             if ($finishedEvent) {
+                 abort(403, 'El evento ha finalizado y no se puede editar. Contacta al administrador si necesitas reactivarlo.');
+             }
+             abort(404, 'No se encontró el evento activo.');
+        }
+
+        $request->validate([
+            'status' => 'required|in:' . Event::STATUS_REGISTRATION . ',' . Event::STATUS_IN_PROGRESS . ',' . Event::STATUS_FINISHED
+        ]);
+
+        $event->update(['status' => $request->status]);
+
+        return redirect()->route('manager.dashboard')->with('success', 'Estado del evento actualizado.');
     }
 }
