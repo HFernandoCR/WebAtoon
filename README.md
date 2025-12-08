@@ -210,6 +210,119 @@ sequenceDiagram
         JudgeController-->>Juez: Redirigir a Dashboard (Éxito)
     end
 ```
-
+  ## Diagrama de Flujo
+```mermaid
+flowchart TB
+    %% ==========================================
+    %% DEFINICION DE CLASES Y ESTILOS
+    %% ==========================================
+    classDef startend fill:#f96,stroke:#333,stroke-width:3px,shape:circle,color:black;
+    classDef process fill:#fff,stroke:#333,stroke-width:1px,color:black;
+    classDef decision fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,shape:diamond,color:black,text-align:center;
+    classDef system fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,stroke-dasharray: 5 5,color:#0d47a1;
+    classDef data fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1px,shape:parallelogram,color:black;
+    %% ==========================================
+    %% NODOS PRINCIPALES
+    %% ==========================================
+    Inicio((Inicio)):::startend
+    Fin((Fin)):::startend
+    %% ==========================================
+    %% CARRILES (SUBGRAPHS)
+    %% ==========================================
+    
+    %% --- CARRIL 1: ESTUDIANTE ---
+    subgraph S_Estudiante [Estudiante - Lider]
+        direction TB
+        E1[Registrarse e Iniciar Sesion]:::process
+        E2[Buscar Eventos Activos]:::process
+        E3[Inscribir Nuevo Proyecto]:::process
+        E4[Invitar Miembros al Equipo]:::process
+        E5[Subir Entregables y Avances]:::process
+        E6[Consultar Resultados Finales]:::process
+        E7[Descargar Constancia]:::process
+    end
+    %% --- CARRIL 2: PLATAFORMA ---
+    subgraph S_Sistema [Sistema WebAtoon]
+        direction TB
+        Sys1{Credenciales Validas?}:::decision
+        Sys2{Fecha Inscripcion Valida?}:::decision
+        Sys3>Guardar Proyecto en BD]:::data
+        Sys4[Notificar al Gestor]:::system
+        Sys5[Enviar Correos de Invitacion]:::system
+        Sys6[Notificar Aprobacion o Rechazo]:::system
+        Sys7{Evento en Curso?}:::decision
+        Sys8[Registrar Evaluaciones]:::system
+        Sys9[Calcular Ranking Automatico]:::system
+        Sys10[Generar Certificados PDF]:::system
+    end
+    %% --- CARRIL 3: GESTOR DE EVENTOS ---
+    subgraph S_Gestor [Gestor de Eventos]
+        direction TB
+        G1[Revisar Solicitud de Proyecto]:::process
+        G2{Aprobar Proyecto?}:::decision
+        G3[Cambiar Estado a Aprobado]:::process
+        G4[Cambiar Estado a Rechazado]:::process
+        G5[Asignar Jueces Disponibles]:::process
+        G6[Cerrar Evento]:::process
+    end
+    %% --- CARRIL 4: JUEZ ---
+    subgraph S_Juez [Juez]
+        direction TB
+        J1[Recibir Notificacion de Asignacion]:::process
+        J2[Revisar Proyecto y Entregables]:::process
+        J3[Evaluar Documento y Presentacion]:::process
+        J4[Enviar Feedback]:::process
+    end
+    %% ==========================================
+    %% CONEXIONES Y FLUJO
+    %% ==========================================
+    %% 1. Inicio y Registro
+    Inicio --> E1
+    E1 --> Sys1
+    Sys1 -- No --> E1
+    Sys1 -- Si --> E2
+    %% 2. Inscripcion
+    E2 --> E3
+    E3 --> Sys2
+    Sys2 -- No --> E2
+    Sys2 -- Si --> Sys3
+    Sys3 --> Sys4
+    %% 3. Aprobacion del Gestor
+    Sys4 --> G1
+    G1 --> G2
+    G2 -- No --> G4
+    G4 --> Sys6
+    Sys6 --> Fin
+    
+    G2 -- Si --> G3
+    G3 --> Sys6
+    Sys6 --> E4
+    %% 4. Formacion de Equipo
+    E4 --> Sys5
+    Sys5 --> E5
+    %% 5. Gestion y Asignacion
+    E5 --> Sys7
+    Sys7 -- Si --> G5
+    G5 --> J1
+    %% 6. Evaluacion
+    J1 --> J2
+    J2 --> J3
+    J3 --> J4
+    J4 --> Sys8
+    %% 7. Cierre y Resultados
+    Sys8 --> Sys9
+    Sys9 --> G6
+    G6 --> E6
+    E6 --> Sys10
+    Sys10 --> E7
+    E7 --> Fin
+    %% ==========================================
+    %% AJUSTES VISUALES
+    %% ==========================================
+    style S_Estudiante fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000
+    style S_Sistema fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style S_Gestor fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,color:#000
+    style S_Juez fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
+```
 ---
 © 2025 WebAtoon. Todos los derechos reservados.
