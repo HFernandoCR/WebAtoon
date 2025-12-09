@@ -80,111 +80,109 @@ class EventManagerController extends Controller
     //        MÓDULO DE ASIGNACIÓN DE JUECES (NUEVO)
     // =========================================================
 
-    public function assignJudgesView(Project $project)
+    // =========================================================
+    //        GESTIÓN DE JUECES DEL EVENTO (NUEVO)
+    // =========================================================
+
+    public function eventJudgesView(Event $event)
     {
-        // 1. Verify manager owns the event of this project
-        if ($project->event->manager_id !== Auth::id()) {
-            abort(403, 'No tienes permiso para gestionar este proyecto.');
+        // 1. Verify manager owns the event
+        if ($event->manager_id !== Auth::id()) {
+            abort(403, 'No tienes permiso para gestionar este evento.');
         }
 
-        // 2. Prevent editing if event is finished
-        if ($project->event->status === Event::STATUS_FINISHED) {
-            abort(403, 'El evento ha finalizado. No se pueden asignar jueces.');
+        if ($event->status === Event::STATUS_FINISHED) {
+            abort(403, 'El evento ha finalizado. No se pueden gestionar jueces.');
         }
 
-        $this->authorize('update', $project->event);
+        // Filter judges: Show all judges, but mark those already assigned to THIS event
+        // Actually, we usually show a list of assigned judges and a form/modal to add new ones.
+        
+        $assignedJudges = $event->judges;
 
-        // Filter judges: Only show judges who are NOT assigned to any ACTIVE project
-        // Note: We exclude the current project's assignments from 'available' naturally via diff, 
-        // but we mainly want to exclude judges busy with OTHER active projects.
-        $allJudges = User::role('judge')
-            ->whereDoesntHave('judgedProjects', function ($query) {
-                // Check if they have any project that belongs to an ACTIVE event
-                $query->whereHas('event', function ($q) {
-                    $q->active();
-                });
-            })
-            ->get();
-
-        $assignedJudges = $project->judges;
-
-        // Available = Valid Judges minus those already assigned to THIS project
-        // (The query above already filtered out judges busy with *other* active projects. 
-        // If a judge is assigned to *this* project (which is active), they are 'busy' but also 'assigned', so they appear in assigned list)
+        // Available = ALL judges minus assigned
+        // Note: User can add any judge not currently on the event.
+        // We might want to warn if they are busy elsewhere, but strict blocking is tricky if they can handle mult. events.
+        // User request: "que pueda asignar 3 juecez al evento en general"
+        
+        $allJudges = User::role('judge')->get();
         $availableJudges = $allJudges->diff($assignedJudges);
 
-        return view('Manager.assign-judges', compact('project', 'assignedJudges', 'availableJudges'));
+        return view('Manager.event-judges', compact('event', 'assignedJudges', 'availableJudges'));
     }
 
-    public function addJudge(Request $request, Project $project)
+    public function addEventJudge(Request $request, Event $event)
     {
-        if ($project->event->manager_id !== Auth::id()) {
-            abort(403, 'No tienes permiso para gestionar este proyecto.');
+        if ($event->manager_id !== Auth::id()) {
+            abort(403, 'No tienes permiso para gestionar este evento.');
         }
 
-        if ($project->event->status === Event::STATUS_FINISHED) {
-            abort(403, 'El evento ha finalizado. No se pueden asignar jueces.');
+        if ($event->status === Event::STATUS_FINISHED) {
+            abort(403, 'El evento ha finalizado.');
         }
-
-        $this->authorize('update', $project->event);
 
         $request->validate([
             'judge_id' => 'required|exists:users,id'
         ]);
+
+        // Max 3 judges per event
+        if ($event->judges()->count() >= 3) {
+            return back()->with('error', 'El evento ya cuenta con el máximo de 3 jueces asignados.');
+        }
 
         $judge = User::find($request->judge_id);
         if (!$judge->hasRole('judge')) {
             return back()->with('error', 'El usuario seleccionado no tiene rol de Juez.');
         }
 
-        // Validación: Máximo 3 jueces por proyecto
-        if ($project->judges()->count() >= 3) {
-            return back()->with('error', 'El proyecto ya cuenta con el máximo de 3 jueces asignados.');
+        // Attach to Event
+        $event->judges()->syncWithoutDetaching([$judge->id]);
+
+        // AUTO-ASSIGN TO ALL PROJECTS IN THIS EVENT
+        foreach ($event->projects as $project) {
+             // Only attach if not already there (syncWithoutDetaching handles this for singular calls, but here we iterate)
+             $project->judges()->syncWithoutDetaching([$judge->id]);
+             
+             // Notify judge only once per event? Or per project? 
+             // "en automatico a los proyectos inscritos" -> probably per project so they know what to grade.
+             // But avoiding spamming 50 notifications is better. 
+             // Let's notify them about the EVENT assignment and let them see the list.
         }
 
-        // Validate Judge Availability
-        $isBusy = $judge->judgedProjects()
-            ->whereHas('event', function ($q) {
-                $q->active();
-            })
-            ->exists();
-
-        if ($isBusy) {
-            return back()->with('error', 'El juez seleccionado ya está evaluando un proyecto en un evento activo. Debe finalizar su asignación actual antes de tomar otro.');
-        }
-
-        $project->judges()->syncWithoutDetaching([$request->judge_id]);
-
+        // Notification for Event Assignment
         Notification::create([
             'user_id' => $judge->id,
             'type' => 'judge_assignment',
-            'title' => 'Proyecto asignado para evaluación',
-            'message' => 'Se te ha asignado evaluar el proyecto "' . $project->title . '". Ingresa a tu panel para calificarlo.',
-            'data' => [
-                'project_id' => $project->id,
-                'event_id' => $project->event_id,
-            ],
-            'url' => route('judge.evaluate', $project->id),
+            'title' => 'Asignado a Evento',
+            'message' => 'Has sido asignado como juez en el evento "' . $event->name . '". Tendrás acceso a todos los proyectos inscritos.',
+            'data' => ['event_id' => $event->id],
+            'url' => route('dashboard'), // Should point to judge dashboard where they see projects
         ]);
 
-        return back()->with('success', 'Juez asignado correctamente.');
+        return back()->with('success', 'Juez asignado al evento y a sus proyectos.');
     }
 
-    public function removeJudge(Project $project, $judgeId)
+    public function removeEventJudge(Event $event, $judgeId)
     {
-        if ($project->event->manager_id !== Auth::id()) {
-            abort(403, 'No tienes permiso para gestionar este proyecto.');
+        if ($event->manager_id !== Auth::id()) {
+            abort(403, 'No tienes permiso.');
         }
 
-        if ($project->event->status === Event::STATUS_FINISHED) {
-            abort(403, 'El evento ha finalizado. No se pueden remover jueces.');
+        if ($event->status === Event::STATUS_FINISHED) {
+            abort(403, 'El evento ha finalizado.');
         }
 
-        $this->authorize('update', $project->event);
+        // Detach from Event
+        $event->judges()->detach($judgeId);
 
-        $project->judges()->detach($judgeId);
+        // OPTIONAL: Detach from all projects? 
+        // "estos 3 jueces podran calificar los proyectos" implies they are THE judges. 
+        // If removed from event, they probably shouldn't grade anymore.
+        foreach ($event->projects as $project) {
+            $project->judges()->detach($judgeId);
+        }
 
-        return back()->with('success', 'Juez removido del proyecto.');
+        return back()->with('success', 'Juez removido del evento y de sus asignaciones.');
     }
 
     // =========================================================

@@ -10,28 +10,28 @@
 
         <div style="flex: 1; padding: 30px; background-color: #f3f4f6;">
 
-                @php
-                    // Check if student has any active project
-                    $hasActiveProject = $projects->contains(function ($project) {
-                        return $project->event && in_array($project->event->status, [App\Models\Event::STATUS_REGISTRATION, App\Models\Event::STATUS_IN_PROGRESS]);
-                    });
-                @endphp
-
-                @if(!$hasActiveProject)
-                <div style="text-align: right; margin-bottom: 20px;">
-                    <a href="{{ route('projects.create') }}"
-                        style="background-color: #2ecc71; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
-                        🚀 Inscribir Nuevo Proyecto
+            <!-- Filters and Action -->
+            <div class="mb-4 flex justify-between items-center">
+                <div class="flex space-x-2">
+                    <a href="{{ route('projects.index') }}" 
+                       class="px-4 py-2 rounded-lg text-sm font-medium {{ !request('status') ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50' }}">
+                       Todos
+                    </a>
+                    <a href="{{ route('projects.index', ['status' => 'active']) }}" 
+                       class="px-4 py-2 rounded-lg text-sm font-medium {{ request('status') === 'active' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50' }}">
+                       Activos
+                    </a>
+                    <a href="{{ route('projects.index', ['status' => 'finished']) }}" 
+                       class="px-4 py-2 rounded-lg text-sm font-medium {{ request('status') === 'finished' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50' }}">
+                       Finalizados
                     </a>
                 </div>
-                @endif
 
-            @if(session('success'))
-                <div
-                    style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                    {{ session('success') }}
-                </div>
-            @endif
+                <a href="{{ route('projects.create') }}"
+                    style="background-color: #2ecc71; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                    🚀 Inscribir Nuevo Proyecto
+                </a>
+            </div>
 
             <div
                 style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
@@ -126,10 +126,16 @@
                 </table>
                 @if($projects->isEmpty())
                     <div style="padding: 30px; text-align: center; color: #7f8c8d;">
-                        <p>No tienes proyectos inscritos aún.</p>
-                        <br>
-                        <a href="{{ route('projects.create') }}"
-                            style="color: #3498db; text-decoration: underline;">¡Inscríbete en un evento ahora!</a>
+                        <p>No se encontraron proyectos con el criterio seleccionado.</p>
+                        @if(!request('status'))
+                             <br>
+                             <a href="{{ route('projects.create') }}"
+                                style="color: #3498db; text-decoration: underline;">¡Inscríbete en un evento ahora!</a>
+                        @endif
+                    </div>
+                @else
+                    <div class="p-4 border-t border-gray-100">
+                        {{ $projects->links() }}
                     </div>
                 @endif
             </div>

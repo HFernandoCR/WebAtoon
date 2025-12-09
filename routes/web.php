@@ -95,10 +95,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // (Próximamente agregaremos la asignación de jueces aquí)
         // ... rutas anteriores del gestor ...
 
-        // Asignación de Jueces
-        Route::get('/event-management/projects/{project}/assign', [EventManagerController::class, 'assignJudgesView'])->name('manager.projects.assign');
-        Route::post('/event-management/projects/{project}/add-judge', [EventManagerController::class, 'addJudge'])->name('manager.projects.add_judge')->middleware('throttle:20,1');
-        Route::delete('/event-management/projects/{project}/remove-judge/{judgeId}', [EventManagerController::class, 'removeJudge'])->name('manager.projects.remove_judge')->middleware('throttle:20,1');
+        // Asignación de Jueces del Evento
+        Route::get('/event-management/{event}/judges', [EventManagerController::class, 'eventJudgesView'])->name('manager.event.judges');
+        Route::post('/event-management/{event}/judges', [EventManagerController::class, 'addEventJudge'])->name('manager.event.judges.add');
+        Route::delete('/event-management/{event}/judges/{judge}', [EventManagerController::class, 'removeEventJudge'])->name('manager.event.judges.remove');
 
         // Editar Evento (Status)
         Route::get('/event-management/edit', [EventManagerController::class, 'editEvent'])->name('manager.event.edit');

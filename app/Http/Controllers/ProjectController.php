@@ -13,11 +13,29 @@ class ProjectController extends Controller
     /**
      * Lista los proyectos DEL estudiante logueado.
      */
-    public function index()
+    /**
+     * Lista los proyectos DEL estudiante logueado (como autor o miembro).
+     */
+    public function index(Request $request)
     {
-        $projects = Project::where('user_id', Auth::id())
-            ->with('event', 'judges')
-            ->paginate(5);
+        $query = Project::where(function($q) {
+            $q->where('user_id', Auth::id())
+              ->orWhereHas('members', function($m) {
+                  $m->where('user_id', Auth::id());
+              });
+        })->with('event', 'judges');
+
+        if ($request->get('status') === 'active') {
+            $query->whereHas('event', function($q) {
+                $q->active();
+            });
+        } elseif ($request->get('status') === 'finished') {
+            $query->whereHas('event', function($q) {
+                $q->finished();
+            });
+        }
+
+        $projects = $query->latest()->paginate(5)->appends($request->query());
 
         return view('Student.projects.index', compact('projects'));
     }
@@ -29,12 +47,17 @@ class ProjectController extends Controller
     {
         $this->authorize('create', Project::class);
 
-        // Check for existing active projects
-        $existingActiveProject = Project::where('user_id', Auth::id())
-            ->whereHas('event', function ($query) {
-                $query->active();
-            })
-            ->first();
+        // Check for existing active projects (as author or member)
+        $existingActiveProject = Project::where(function($q) {
+            $q->where('user_id', Auth::id())
+              ->orWhereHas('members', function($m) {
+                  $m->where('user_id', Auth::id())->where('status', 'accepted');
+              });
+        })
+        ->whereHas('event', function ($query) {
+            $query->active();
+        })
+        ->first();
 
         if ($existingActiveProject) {
             return redirect()->route('projects.index')->with('error', 'Ya tienes un proyecto activo (' . $existingActiveProject->title . '). No puedes registrar otro hasta que el evento finalice.');
@@ -69,12 +92,17 @@ class ProjectController extends Controller
         $event = Event::findOrFail($request->event_id);
         $now = now();
 
-        // Check for existing active projects (where event is not finished)
-        $existingActiveProject = Project::where('user_id', Auth::id())
-            ->whereHas('event', function ($query) {
-                $query->active(); // Scope defined in Event model (registration or in_progress)
-            })
-            ->first();
+        // Check for existing active projects (as author or member)
+        $existingActiveProject = Project::where(function($q) {
+            $q->where('user_id', Auth::id())
+              ->orWhereHas('members', function($m) {
+                  $m->where('user_id', Auth::id())->where('status', 'accepted');
+              });
+        })
+        ->whereHas('event', function ($query) {
+             $query->active();
+        })
+        ->first();
 
         if ($existingActiveProject) {
             return back()->withErrors(['error' => 'Ya tienes un proyecto activo en curso. Solo puedes registrar un nuevo proyecto cuando el evento actual haya finalizado.']);
@@ -123,6 +151,11 @@ class ProjectController extends Controller
                 'data' => ['project_id' => $project->id],
                 'url' => route('advisor.dashboard'),
             ]);
+        }
+
+        // AUTO-ASSIGN EVENT JUDGES TO NEW PROJECT
+        foreach ($event->judges as $judge) {
+            $project->judges()->attach($judge->id);
         }
 
         // Notify Admins
@@ -225,11 +258,16 @@ class ProjectController extends Controller
         // Prioritize ACTIVE project.
         // If the student has a finished project but no active one, we show NOTHING (or handle in view).
         // The user specifically requested: "haz que cuando un equipo de un proyecto finalizado ya no salga"
-        $project = Project::where('user_id', Auth::id())
-            ->whereHas('event', function ($query) {
-                $query->active();
-            })
-            ->first();
+        $project = Project::where(function($q) {
+            $q->where('user_id', Auth::id())
+              ->orWhereHas('members', function($m) {
+                  $m->where('user_id', Auth::id())->where('status', 'accepted');
+              });
+        })
+        ->whereHas('event', function ($query) {
+            $query->active();
+        })
+        ->first();
 
         return view('Student.team', compact('project'));
     }
@@ -247,7 +285,7 @@ class ProjectController extends Controller
         $projects = Project::where(function($q) {
                 $q->where('user_id', Auth::id())
                   ->orWhereHas('members', function($m) {
-                      $m->where('user_id', Auth::id())->where('status', 'accepted');
+                      $m->where('user_id', Auth::id());
                   });
             })
             ->with(['event', 'judges'])
