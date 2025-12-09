@@ -105,16 +105,9 @@ class EventManagerController extends Controller
             abort(403, 'El evento ha finalizado. No se pueden gestionar jueces.');
         }
 
-        // Filter judges: Show all judges, but mark those already assigned to THIS event
-        // Actually, we usually show a list of assigned judges and a form/modal to add new ones.
-
         $assignedJudges = $event->judges;
 
-        // Available = ALL judges minus assigned
-        // Note: User can add any judge not currently on the event.
-        // We might want to warn if they are busy elsewhere, but strict blocking is tricky if they can handle mult. events.
-        // User request: "que pueda asignar 3 juecez al evento en general"
-
+        // Mostrar jueces aptos para ser asignados (que no estén ya en el evento)
         $allJudges = User::role('judge')->get();
         $availableJudges = $allJudges->diff($assignedJudges);
 
@@ -148,15 +141,9 @@ class EventManagerController extends Controller
         // Attach to Event
         $event->judges()->syncWithoutDetaching([$judge->id]);
 
-        // AUTO-ASSIGN TO ALL PROJECTS IN THIS EVENT
+        // Asignar juez automáticamente a todos los proyectos del evento
         foreach ($event->projects as $project) {
-            // Only attach if not already there (syncWithoutDetaching handles this for singular calls, but here we iterate)
             $project->judges()->syncWithoutDetaching([$judge->id]);
-
-            // Notify judge only once per event? Or per project? 
-            // "en automatico a los proyectos inscritos" -> probably per project so they know what to grade.
-            // But avoiding spamming 50 notifications is better. 
-            // Let's notify them about the EVENT assignment and let them see the list.
         }
 
         // Notification for Event Assignment
@@ -185,9 +172,7 @@ class EventManagerController extends Controller
         // Detach from Event
         $event->judges()->detach($judgeId);
 
-        // OPTIONAL: Detach from all projects? 
-        // "estos 3 jueces podran calificar los proyectos" implies they are THE judges. 
-        // If removed from event, they probably shouldn't grade anymore.
+        // Remover asignación de los proyectos también
         foreach ($event->projects as $project) {
             $project->judges()->detach($judgeId);
         }
