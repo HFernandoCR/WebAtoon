@@ -16,6 +16,12 @@ class EventController extends Controller
         return view('Admin.events.index', compact('events'));
     }
 
+    public function activeEvents()
+    {
+        $events = Event::active()->get();
+        return view('events.active', compact('events'));
+    }
+
     public function create()
     {
         $this->authorize('create', Event::class);
