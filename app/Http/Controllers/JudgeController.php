@@ -47,15 +47,8 @@ class JudgeController extends Controller
     /**
      * Guardar la calificación
      */
-    public function update(Request $request, Project $project)
+    public function update(\App\Http\Requests\EvaluateProjectRequest $request, Project $project)
     {
-
-        $request->validate([
-            'score_document' => 'required|numeric|min:0|max:20',
-            'score_presentation' => 'required|numeric|min:0|max:30',
-            'score_demo' => 'required|numeric|min:0|max:50',
-            'feedback' => 'required|string|min:10'
-        ]);
 
         // Check if user is assigned to this project
         $isAssigned = Auth::user()->judgedProjects()->where('project_id', $project->id)->exists();
