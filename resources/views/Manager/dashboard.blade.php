@@ -1,8 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Gestión Operativa: ') }} <span style="color: #9b59b6;">{{ $event->name }}</span>
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Gestión Operativa: ') }} <span style="color: #9b59b6;">{{ $event->name }}</span>
+            </h2>
+            <a href="{{ route('manager.event.judges', $event) }}" 
+               style="background-color: #34495e; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-size: 0.9rem;">
+               <i class="fas fa-gavel"></i> Gestionar Jueces del Evento
+            </a>
+        </div>
     </x-slot>
 
     <div style="display: flex; min-height: calc(100vh - 65px);">
@@ -130,10 +136,7 @@
                                             </form>
                                         @endif
 
-                                        <a href="{{ route('manager.projects.assign', $project) }}" title="Asignar Jueces"
-                                            style="display: inline-flex; align-items: center; justify-content: center; background: #9b59b6; color: white; border: none; padding: 0 10px; height: 30px; border-radius: 5px; text-decoration: none; width: auto;">
-                                            Asignar
-                                        </a>
+
                                     </div>
                                 </td>
                             </tr>
