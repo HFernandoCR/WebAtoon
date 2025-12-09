@@ -91,4 +91,9 @@ class Project extends Model
     {
         return $this->belongsTo(User::class, 'advisor_id');
     }
+
+    public function deliverables()
+    {
+        return $this->hasMany(\App\Models\Deliverable::class);
+    }
 }
