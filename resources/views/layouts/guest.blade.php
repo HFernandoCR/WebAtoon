@@ -17,11 +17,10 @@
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
-    <div
-        class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gradient-to-b from-[#6d28d9] to-[#5b21b6]">
+    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
         <div>
             <a href="/">
-                <x-application-logo class="w-20 h-20 fill-current text-white" />
+                <x-application-logo class="w-20 h-20 fill-current text-[#6d28d9]" />
             </a>
         </div>
 
