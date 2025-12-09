@@ -75,35 +75,33 @@ Para configurar el proyecto automáticamente, sigue estos pasos:
 sequenceDiagram
     actor Estudiante
     participant ProjectController
-    participant Modelo Evento
-    participant Modelo Proyecto
-    participant Modelo Notificacion
-    participant BaseDeDatos
+    participant Evento as Modelo Evento
+    participant Proyecto as Modelo Proyecto
+    participant Notificacion as Modelo Notificacion
+    participant BD as BaseDeDatos
 
     Estudiante->>ProjectController: POST /projects (store)
     
-    ProjectController->>Modelo Proyecto: Verificar si ya tiene proyecto activo
+    ProjectController->>Proyecto: Verificar si usuario ya tiene proyecto activo
     alt Ya tiene proyecto activo
         ProjectController-->>Estudiante: Error: Ya tienes un proyecto en curso
     else No tiene proyecto activo
-        ProjectController->>Modelo Evento: findOrFail(event_id)
-        Modelo Evento-->>ProjectController: Datos del Evento
+        ProjectController->>Evento: findOrFail(event_id)
+        Evento-->>ProjectController: Datos del Evento
         
-        ProjectController->>ProjectController: Validar Fecha y Estado (Inscripciones abiertas)
+        ProjectController->>ProjectController: Validar Fecha Actual vs (start_date, end_date)
         
-        alt Fecha/Estado Inválido
+        alt Evento no activo / fuera de fecha
             ProjectController-->>Estudiante: Error: El evento no está activo
         else Evento Válido
-            ProjectController->>Modelo Proyecto: create(datos)
-            Modelo Proyecto->>BaseDeDatos: Insertar Proyecto
-            BaseDeDatos-->>Modelo Proyecto: Proyecto Creado
+            ProjectController->>Proyecto: create(título, descripción, categoría, etc.)
+            Proyecto->>BD: Insertar Proyecto
+            BD-->>Proyecto: ID Proyecto
             
-            par Notificar Gestor de Eventos
-                ProjectController->>Modelo Notificacion: create(nuevo_proyecto_registrado)
-            and Notificar Asesor (si fue seleccionado)
-                ProjectController->>Modelo Notificacion: create(asesor_asignado)
-            and Notificar Administradores
-                ProjectController->>Modelo Notificacion: create(nuevo_proyecto)
+            par Notificaciones
+                ProjectController->>Notificacion: Notificar Gestor de Eventos (Nuevo Proyecto)
+                ProjectController->>Notificacion: Notificar Asesor (si fue seleccionado)
+                ProjectController->>Notificacion: Notificar Administradores
             end
             
             ProjectController-->>Estudiante: Redirigir a Índice (Éxito)
@@ -115,32 +113,32 @@ sequenceDiagram
 sequenceDiagram
     actor Lider as Estudiante (Líder)
     participant TeamController
-    participant Modelo Proyecto
-    participant Modelo ProjectMember
-    participant Modelo Usuario
-    participant Sistema Notificaciones
+    participant Proyecto as Modelo Proyecto
+    participant Miembro as Modelo ProjectMember
+    participant Usuario as Modelo Usuario
+    participant SistemaNotif as Sistema Notificaciones
 
     Lider->>TeamController: POST /team/invite (email)
-    TeamController->>Modelo Proyecto: Obtener Proyecto del Líder
+    TeamController->>Proyecto: Obtener Proyecto del Líder
     
-    rect rgb(240, 240, 240)
-        note right of TeamController: Validaciones
-        TeamController->>Modelo ProjectMember: Contar miembros aceptados (< 5)
-        TeamController->>Modelo Usuario: Buscar usuario por email (rol: estudiante)
-        TeamController->>Modelo Proyecto: Verificar si el invitado ya lidera un proyecto
-        TeamController->>Modelo ProjectMember: Verificar si el invitado ya está en otro equipo
+    rect rgb(245, 245, 245)
+        note right of TeamController: Validaciones de Negocio
+        TeamController->>Miembro: Contar miembros aceptados (Máx 5)
+        TeamController->>Usuario: Buscar por email (Rol: Estudiante)
+        TeamController->>Proyecto: Verificar si invitado ya lidera otro proyecto
+        TeamController->>Miembro: Verificar si invitado ya pertenece a otro equipo
     end
     
-    alt Validación Falla
-        TeamController-->>Lider: Mensaje de Error
+    alt Alguna Validación Falla
+        TeamController-->>Lider: Mensaje de Error (Feedback específico)
     else Validación Exitosa
-        TeamController->>Modelo ProjectMember: firstOrCreate(status: pendiente)
+        TeamController->>Miembro: firstOrCreate(status: pendiente)
         
-        alt Ya invitado o Miembro
-            TeamController-->>Lider: Error: Ya invitado/miembro
-        else Nueva Invitación
-            Modelo ProjectMember->>Sistema Notificaciones: Enviar Notificación (Email/BD)
-            Sistema Notificaciones-->>Modelo Usuario (Invitado): Recibir Invitación
+        alt Invitación ya existente
+            TeamController-->>Lider: Error: Usuario ya invitado o miembro
+        else Nueva Invitación Creada
+            Miembro->>SistemaNotif: Enviar Notificación (Email / BD)
+            SistemaNotif-->>Usuario: Recibir Invitación
             TeamController-->>Lider: Mensaje de Éxito
         end
     end
@@ -149,32 +147,39 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     actor Gestor as Gestor de Eventos
-    participant EventManagerController
-    participant Modelo Evento
-    participant Modelo Usuario (Juez)
-    participant Modelo Proyecto
-    participant Modelo Notificacion
-    participant BaseDeDatos
+    participant EventManager as EventManagerController
+    participant Evento as Modelo Evento
+    participant UsuarioJuez as Modelo Usuario (Juez)
+    participant Proyecto as Modelo Proyecto
+    participant Notificacion as Modelo Notificacion
+    participant BD as BaseDeDatos
 
-    Gestor->>EventManagerController: POST /projects/{id}/add-judge
-    EventManagerController->>Modelo Evento: Verificar que el Gestor sea dueño del Evento
+    Gestor->>EventManager: POST /events/{id}/add-judge (judge_id)
     
-    alt No es Dueño / Evento Finalizado
-        EventManagerController-->>Gestor: 403 Prohibido
-    else Es Dueño y Evento Activo
-        EventManagerController->>Modelo Usuario (Juez): Verificar rol 'judge'
-        EventManagerController->>Modelo Usuario (Juez): Verificar Disponibilidad (No ocupado en otro evento activo)
+    EventManager->>Evento: Verificar propiedad (manager_id) y estado activo
+    alt No autorizado o Evento Finalizado
+        EventManager-->>Gestor: 403 Prohibido
+    else Validaciones Correctas
+        EventManager->>Evento: Verificar Cantidad Jueces (< 3)
+        EventManager->>UsuarioJuez: Verificar Rol 'judge'
         
-        alt Rol Inválido u Ocupado
-            EventManagerController-->>Gestor: Error: Juez no válido u ocupado
-        else Disponible
-            EventManagerController->>Modelo Proyecto: judges()->syncWithoutDetaching()
-            Modelo Proyecto->>BaseDeDatos: Vincular Juez al Proyecto
+        alt Máximo de jueces o Rol inválido
+            EventManager-->>Gestor: Error con mensaje
+        else Todo Correcto
+            note right of EventManager: Vinculación Principal
+            EventManager->>Evento: judges()->syncWithoutDetaching(judge_id)
+            Evento->>BD: Registrar en event_judge
             
-            EventManagerController->>Modelo Notificacion: create(asignacion_juez)
-            Modelo Notificacion-->>Modelo Usuario (Juez): Notificar Juez
+            note right of EventManager: Propagación a Proyectos
+            loop Por cada proyecto en el evento
+                EventManager->>Proyecto: judges()->syncWithoutDetaching(judge_id)
+                Proyecto->>BD: Registrar en project_judge
+            end
             
-            EventManagerController-->>Gestor: Mensaje de Éxito
+            EventManager->>Notificacion: create(asignacion_juez_evento)
+            Notificacion-->>UsuarioJuez: "Has sido asignado al evento X"
+            
+            EventManager-->>Gestor: Mensaje de Éxito
         end
     end
 ```
@@ -182,36 +187,85 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     actor Juez
-    participant JudgeController
-    participant Modelo Proyecto
-    participant Tabla Pivote (project_judge)
-    participant ServicioRanking
-    participant Modelo Notificacion
+    participant JudgeCtrl as JudgeController
+    participant Proyecto as Modelo Proyecto
+    participant Pivote as Tabla Pivote (project_judge)
+    participant Ranking as RankingService
+    participant Notificacion as Modelo Notificacion
 
-    Juez->>JudgeController: POST /judge/evaluate/{id}
-    JudgeController->>Modelo Proyecto: Verificar Asignación
+    Juez->>JudgeCtrl: POST /judge/evaluate/{id}
+    JudgeCtrl->>Proyecto: Verificar asignación (Juez -> Proyecto)
     
-    alt No Asignado
-        JudgeController-->>Juez: 403 Prohibido
+    alt No asignado
+        JudgeCtrl-->>Juez: 403 Prohibido
     else Asignado
-        JudgeController->>JudgeController: Validar Puntajes (Doc, Presentación, Demo)
-        JudgeController->>JudgeController: Calcular Puntaje Final (Suma)
+        rect rgb(255, 240, 240)
+            note right of JudgeCtrl: Validación de Requisitos
+            JudgeCtrl->>Proyecto: Verificar repository_url o deliverables
+            alt Sin Entregables/Repo
+                JudgeCtrl-->>Juez: Error: "El equipo no ha subido entregables"
+            end
+            JudgeCtrl->>Proyecto: Verificar Fechas del Evento
+        end
+
+        JudgeCtrl->>JudgeCtrl: Calcular Score Final (Doc + Pres + Demo)
         
-        JudgeController->>Tabla Pivote (project_judge): updateExistingPivot(scores, feedback)
+        JudgeCtrl->>Pivote: updateExistingPivot(scores, feedback)
         
-        JudgeController->>Modelo Proyecto: Notificar Estudiante (ProyectoEvaluado)
-        
-        rect rgb(230, 245, 255)
-            note right of JudgeController: Actualización de Ranking Automática
-            JudgeController->>ServicioRanking: calculateProjectAverage(proyecto)
-            JudgeController->>ServicioRanking: updateEventRankings(event_id)
+        par Notificaciones y Ranking
+            JudgeCtrl->>Notificacion: Notificar Estudiante (ProyectoEvaluado)
+            
+            note right of JudgeCtrl: Lógica de Ranking
+            JudgeCtrl->>Ranking: calculateProjectAverage(proyecto)
+            Ranking->>Proyecto: update(average_score)
+            
+            JudgeCtrl->>Ranking: updateEventRankings(event_id)
+            Ranking->>Proyecto: Recalcular posiciones (1, 2, 3...)
+            
+            JudgeCtrl->>Notificacion: Notificar Gestor de Eventos (Evaluación Completada)
         end
         
-        JudgeController->>Modelo Notificacion: Notificar Gestor de Eventos
-        
-        JudgeController-->>Juez: Redirigir a Dashboard (Éxito)
+        JudgeCtrl-->>Juez: Redirigir a Dashboard (Éxito)
     end
 ```
+5. Administrador: Crear Nuevo Evento
+```mermaid
+sequenceDiagram
+    actor Admin as Administrador
+    participant EventController
+    participant Usuario as Modelo Usuario
+    participant Evento as Modelo Evento
+    participant Notificacion as Modelo Notificacion
+    participant BD as BaseDeDatos
+
+    Admin->>EventController: POST /events (store)
+    
+    EventController->>Usuario: find(manager_id)
+    
+    rect rgb(240, 240, 255)
+        note right of EventController: Validaciones de Gestor
+        alt Usuario no existe o no es Gestor
+            EventController-->>Admin: Error: "El usuario no tiene rol de Gestor"
+        end
+        
+        EventController->>Evento: Verificar si Gestor ya tiene evento ACTIVO
+        alt Ya tiene evento activo
+            EventController-->>Admin: Error: "Este gestor ya administra un evento activo"
+        end
+    end
+    
+    alt Validaciones Exitosas
+        EventController->>Evento: create(request->all())
+        Evento->>BD: Insertar Evento
+        BD-->>Evento: ID Evento
+        
+        EventController->>Notificacion: create(event_assigned)
+        Notificacion-->>Usuario: "Se te ha asignado el evento X"
+        
+        EventController-->>Admin: Redirigir a Lista (Éxito)
+    end
+```
+    
   ## Diagrama de Flujo
 ```mermaid
 flowchart TB
@@ -326,5 +380,6 @@ flowchart TB
     style S_Gestor fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,color:#000
     style S_Juez fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
 ```
+
 ---
 © 2025 WebAtoon. Todos los derechos reservados.
