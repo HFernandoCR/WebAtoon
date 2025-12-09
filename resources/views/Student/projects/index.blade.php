@@ -33,6 +33,22 @@
                 </div>
             @endif
 
+            <!-- Filters -->
+            <div class="mb-4 flex space-x-2">
+                <a href="{{ route('projects.index') }}" 
+                   class="px-4 py-2 rounded-lg text-sm font-medium {{ !request('status') ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50' }}">
+                   Todos
+                </a>
+                <a href="{{ route('projects.index', ['status' => 'active']) }}" 
+                   class="px-4 py-2 rounded-lg text-sm font-medium {{ request('status') === 'active' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50' }}">
+                   Activos
+                </a>
+                <a href="{{ route('projects.index', ['status' => 'finished']) }}" 
+                   class="px-4 py-2 rounded-lg text-sm font-medium {{ request('status') === 'finished' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50' }}">
+                   Finalizados
+                </a>
+            </div>
+
             <div
                 style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                 <table style="width: 100%; border-collapse: collapse;">
@@ -126,10 +142,16 @@
                 </table>
                 @if($projects->isEmpty())
                     <div style="padding: 30px; text-align: center; color: #7f8c8d;">
-                        <p>No tienes proyectos inscritos aún.</p>
-                        <br>
-                        <a href="{{ route('projects.create') }}"
-                            style="color: #3498db; text-decoration: underline;">¡Inscríbete en un evento ahora!</a>
+                        <p>No se encontraron proyectos con el criterio seleccionado.</p>
+                        @if(!request('status'))
+                             <br>
+                             <a href="{{ route('projects.create') }}"
+                                style="color: #3498db; text-decoration: underline;">¡Inscríbete en un evento ahora!</a>
+                        @endif
+                    </div>
+                @else
+                    <div class="p-4 border-t border-gray-100">
+                        {{ $projects->links() }}
                     </div>
                 @endif
             </div>

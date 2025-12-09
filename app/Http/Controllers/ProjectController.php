@@ -13,11 +13,24 @@ class ProjectController extends Controller
     /**
      * Lista los proyectos DEL estudiante logueado.
      */
-    public function index()
+    /**
+     * Lista los proyectos DEL estudiante logueado.
+     */
+    public function index(Request $request)
     {
-        $projects = Project::where('user_id', Auth::id())
-            ->with('event', 'judges')
-            ->paginate(5);
+        $query = Project::where('user_id', Auth::id())->with('event', 'judges');
+
+        if ($request->get('status') === 'active') {
+            $query->whereHas('event', function($q) {
+                $q->active();
+            });
+        } elseif ($request->get('status') === 'finished') {
+            $query->whereHas('event', function($q) {
+                $q->finished();
+            });
+        }
+
+        $projects = $query->latest()->paginate(5)->appends($request->query());
 
         return view('Student.projects.index', compact('projects'));
     }
