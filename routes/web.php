@@ -16,7 +16,8 @@ use App\Http\Controllers\AdvisorController;
 
 
 Route::get('/', function () {
-    return view('welcome');
+    $events = Event::where('status', 'registration')->take(3)->get();
+    return view('welcome', compact('events'));
 })->name('welcome');
 
 Route::get('/validate-certificate', [App\Http\Controllers\CertificateValidationController::class, 'validateCertificate'])->name('certificate.validate');

@@ -268,6 +268,45 @@
         @endcan
     </header>
 
+    @if(isset($events) && $events->count() > 0)
+        <section class="features-section" style="background-color: #f3f4f6; padding-bottom: 20px;">
+            <h2 class="section-title">Próximos Eventos / Inscripciones Abiertas</h2>
+            <div class="cards-container">
+                @foreach($events as $event)
+                    <div class="feature-card" style="background: white; border-top: 5px solid #6d28d9; text-align: left;">
+                        <div
+                            style="font-size: 0.9em; color: #6d28d9; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">
+                            {{ $event->category->name ?? 'Evento Académico' }}
+                        </div>
+                        <h3 style="margin-bottom: 10px;">{{ $event->name }}</h3>
+                        <p style="margin-bottom: 20px; min-height: 50px;">
+                            {{ Str::limit($event->description, 100) }}
+                        </p>
+                        <div style="font-size: 0.9em; color: #555; margin-bottom: 20px;">
+                            <i class="far fa-calendar"></i> Inicia:
+                            {{ \Carbon\Carbon::parse($event->start_date)->format('d/m/Y') }}
+                        </div>
+
+                        @auth
+                            <a href="{{ route('events.active') }}"
+                                style="display: block; text-align: center; background-color: #10b981; color: white; padding: 10px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                                Inscribir Proyecto
+                            </a>
+                        @else
+                            <a href="{{ route('register') }}"
+                                style="display: block; text-align: center; background-color: #3b82f6; color: white; padding: 10px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                                Registrarse para Participar
+                            </a>
+                        @endauth
+                    </div>
+                @endforeach
+            </div>
+            @if($events->count() == 0)
+                <p style="text-align: center; color: #777; margin-top: 20px;">No hay eventos abiertos en este momento.</p>
+            @endif
+        </section>
+    @endif
+
     <section class="features-section">
         <h2 class="section-title">Todo lo que necesitas para gestionar eventos</h2>
 
