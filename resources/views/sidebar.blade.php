@@ -4,7 +4,7 @@
     class="fixed inset-0 bg-black/50 z-40 hidden md:hidden transition-opacity duration-300"></div>
 
 <aside id="sidebar-container"
-    class="fixed inset-y-0 left-0 w-64 transform -translate-x-full md:translate-x-0 md:relative md:inset-auto md:w-full min-h-screen bg-slate-900 text-white flex flex-col p-6 overflow-hidden transition-transform duration-300 ease-in-out z-50">
+    class="fixed inset-y-0 left-0 w-64 transform -translate-x-full md:translate-x-0 md:relative md:inset-auto md:w-full h-full bg-slate-900 text-white flex flex-col p-6 overflow-hidden transition-transform duration-300 ease-in-out z-50">
     <!-- Close Button (Mobile Only) -->
     <button onclick="toggleSidebar()" class="absolute top-4 right-4 text-gray-400 hover:text-white md:hidden">
         ✕

@@ -25,7 +25,7 @@
 
         <!-- Sidebar (Global Inclusion) -->
         <!-- On Desktop: Relative, takes space. On Mobile: Fixed, Overlay handled by component css/js or alpine -->
-        <div class="shrink-0 h-screen sticky top-0 md:relative z-50">
+        <div class="shrink-0 h-screen sticky top-0 md:relative z-50 md:w-64 md:bg-slate-900">
             @include('sidebar')
         </div>
 
