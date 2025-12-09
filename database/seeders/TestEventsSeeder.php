@@ -18,10 +18,11 @@ class TestEventsSeeder extends Seeder
         // 1. Get or Create Manager
         $manager = User::role('event_manager')->first();
         if (!$manager) {
-            $manager = User::factory()->create([
+            $manager = User::create([
                 'name' => 'Gestor de Prueba',
                 'email' => 'gestor_' . uniqid() . '@webathoon.com',
                 'password' => Hash::make('password'),
+                'email_verified_at' => now(),
             ]);
             $manager->assignRole('event_manager');
             $this->command->info("Gestor de prueba creado: {$manager->email}");
