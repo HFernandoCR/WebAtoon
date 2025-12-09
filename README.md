@@ -277,19 +277,30 @@ flowchart TB
     classDef decision fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,shape:diamond,color:black,text-align:center;
     classDef system fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,stroke-dasharray: 5 5,color:#0d47a1;
     classDef data fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1px,shape:parallelogram,color:black;
+
     %% ==========================================
     %% NODOS PRINCIPALES
     %% ==========================================
     Inicio((Inicio)):::startend
     Fin((Fin)):::startend
+
     %% ==========================================
     %% CARRILES (SUBGRAPHS)
     %% ==========================================
-    
+
+    %% --- CARRIL 0: ADMINISTRADOR ---
+    subgraph S_Admin [Administrador]
+        direction TB
+        A1[Iniciar Sesion Admin]:::process
+        A2[Crear Nuevo Evento]:::process
+        A3[Asignar Gestor de Eventos]:::process
+        A4[Gestionar Usuarios]:::process
+    end
+
     %% --- CARRIL 1: ESTUDIANTE ---
     subgraph S_Estudiante [Estudiante - Lider]
         direction TB
-        E1[Registrarse e Iniciar Sesion]:::process
+        E1[Registrarse / Login]:::process
         E2[Buscar Eventos Activos]:::process
         E3[Inscribir Nuevo Proyecto]:::process
         E4[Invitar Miembros al Equipo]:::process
@@ -297,9 +308,11 @@ flowchart TB
         E6[Consultar Resultados Finales]:::process
         E7[Descargar Constancia]:::process
     end
+
     %% --- CARRIL 2: PLATAFORMA ---
     subgraph S_Sistema [Sistema WebAtoon]
         direction TB
+        Sys0[Notificar Asignacion a Gestor]:::system
         Sys1{Credenciales Validas?}:::decision
         Sys2{Fecha Inscripcion Valida?}:::decision
         Sys3>Guardar Proyecto en BD]:::data
@@ -311,16 +324,19 @@ flowchart TB
         Sys9[Calcular Ranking Automatico]:::system
         Sys10[Generar Certificados PDF]:::system
     end
+
     %% --- CARRIL 3: GESTOR DE EVENTOS ---
     subgraph S_Gestor [Gestor de Eventos]
         direction TB
+        G0[Recibir Notificacion de Evento]:::process
         G1[Revisar Solicitud de Proyecto]:::process
         G2{Aprobar Proyecto?}:::decision
         G3[Cambiar Estado a Aprobado]:::process
         G4[Cambiar Estado a Rechazado]:::process
-        G5[Asignar Jueces Disponibles]:::process
+        G5[Asignar Jueces al Evento]:::process
         G6[Cerrar Evento]:::process
     end
+
     %% --- CARRIL 4: JUEZ ---
     subgraph S_Juez [Juez]
         direction TB
@@ -329,21 +345,33 @@ flowchart TB
         J3[Evaluar Documento y Presentacion]:::process
         J4[Enviar Feedback]:::process
     end
+
     %% ==========================================
     %% CONEXIONES Y FLUJO
     %% ==========================================
-    %% 1. Inicio y Registro
+    
+    %% 0. Inicio Administrativo
+    Inicio --> A1
+    A1 --> A2
+    A2 --> A3
+    A3 --> Sys0
+    Sys0 --> G0
+    
+    %% 1. Inicio Estudiante
     Inicio --> E1
     E1 --> Sys1
     Sys1 -- No --> E1
     Sys1 -- Si --> E2
+    
     %% 2. Inscripcion
     E2 --> E3
     E3 --> Sys2
     Sys2 -- No --> E2
     Sys2 -- Si --> Sys3
     Sys3 --> Sys4
+    
     %% 3. Aprobacion del Gestor
+    G0 --> G1
     Sys4 --> G1
     G1 --> G2
     G2 -- No --> G4
@@ -353,18 +381,22 @@ flowchart TB
     G2 -- Si --> G3
     G3 --> Sys6
     Sys6 --> E4
+    
     %% 4. Formacion de Equipo
     E4 --> Sys5
     Sys5 --> E5
+    
     %% 5. Gestion y Asignacion
     E5 --> Sys7
     Sys7 -- Si --> G5
     G5 --> J1
+    
     %% 6. Evaluacion
     J1 --> J2
     J2 --> J3
     J3 --> J4
     J4 --> Sys8
+    
     %% 7. Cierre y Resultados
     Sys8 --> Sys9
     Sys9 --> G6
@@ -372,9 +404,11 @@ flowchart TB
     E6 --> Sys10
     Sys10 --> E7
     E7 --> Fin
+
     %% ==========================================
     %% AJUSTES VISUALES
     %% ==========================================
+    style S_Admin fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
     style S_Estudiante fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000
     style S_Sistema fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
     style S_Gestor fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,color:#000
