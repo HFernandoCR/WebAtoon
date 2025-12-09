@@ -70,4 +70,11 @@ class Event extends Model
     {
         return $this->hasMany(Project::class);
     }
+    /**
+     * Relación: Un evento tiene muchos jueces asignados
+     */
+    public function judges()
+    {
+        return $this->belongsToMany(User::class, 'event_judge')->withTimestamps();
+    }
 }

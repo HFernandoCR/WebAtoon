@@ -153,6 +153,11 @@ class ProjectController extends Controller
             ]);
         }
 
+        // AUTO-ASSIGN EVENT JUDGES TO NEW PROJECT
+        foreach ($event->judges as $judge) {
+            $project->judges()->attach($judge->id);
+        }
+
         // Notify Admins
         $admins = \App\Models\User::role('admin')->get();
         foreach ($admins as $admin) {
@@ -253,11 +258,16 @@ class ProjectController extends Controller
         // Prioritize ACTIVE project.
         // If the student has a finished project but no active one, we show NOTHING (or handle in view).
         // The user specifically requested: "haz que cuando un equipo de un proyecto finalizado ya no salga"
-        $project = Project::where('user_id', Auth::id())
-            ->whereHas('event', function ($query) {
-                $query->active();
-            })
-            ->first();
+        $project = Project::where(function($q) {
+            $q->where('user_id', Auth::id())
+              ->orWhereHas('members', function($m) {
+                  $m->where('user_id', Auth::id())->where('status', 'accepted');
+              });
+        })
+        ->whereHas('event', function ($query) {
+            $query->active();
+        })
+        ->first();
 
         return view('Student.team', compact('project'));
     }
@@ -275,7 +285,7 @@ class ProjectController extends Controller
         $projects = Project::where(function($q) {
                 $q->where('user_id', Auth::id())
                   ->orWhereHas('members', function($m) {
-                      $m->where('user_id', Auth::id())->where('status', 'accepted');
+                      $m->where('user_id', Auth::id());
                   });
             })
             ->with(['event', 'judges'])
