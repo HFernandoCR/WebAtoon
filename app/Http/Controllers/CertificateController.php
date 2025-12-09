@@ -84,8 +84,9 @@ class CertificateController extends Controller
             $durationHours = 24; // Default
         }
 
-        // $validationUrl = route('welcome'); 
-        $validationUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'; // URL solicitada para prueba
+        // URL de validación del certificado (incluye folio para verificación futura)
+        $folio = 'CONST-' . strtoupper(substr($user->getRoleNames()->first(), 0, 3)) . '-' . str_pad($user->id, 5, '0', STR_PAD_LEFT) . '-' . now()->format('Y');
+        $validationUrl = config('app.url') . '/validate-certificate?folio=' . $folio;
 
         // Generar QR en formato SVG (base64 para incrustar)
         // Usamos SVG para no depender de la extensión ImageMagick
@@ -107,7 +108,7 @@ class CertificateController extends Controller
             'durationHours' => $durationHours,
             'location' => strtoupper($project->event ? $project->event->location : 'Ciudad de México'),
             'issueDate' => now()->translatedFormat('d \d\e F \d\e Y'),
-            'folio' => 'CONST-' . strtoupper(substr($user->getRoleNames()->first(), 0, 3)) . '-' . str_pad($user->id, 5, '0', STR_PAD_LEFT) . '-' . now()->format('Y'),
+            'folio' => $folio,
             'isAdvisor' => $user->hasRole('advisor'),
             'participationType' => $participationType,
             'validationUrl' => $validationUrl,
