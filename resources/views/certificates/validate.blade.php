@@ -33,7 +33,14 @@
                             <h3 class="font-semibold text-gray-700 mb-2">Información del Certificado:</h3>
                             <ul class="text-sm text-gray-600 space-y-1">
                                 <li><strong>Folio:</strong> {{ $folio }}</li>
-                                <li><strong>Fecha de consulta:</strong> {{ now()->format('d/m/Y H:i') }}</li>
+                                <li><strong>Nombre:</strong> {{ $certificate->user->name }}</li>
+                                <li><strong>Proyecto:</strong>
+                                    {{ $certificate->project ? $certificate->project->title : 'N/A' }}</li>
+                                <li><strong>Evento:</strong>
+                                    {{ $certificate->project && $certificate->project->event ? $certificate->project->event->name : 'N/A' }}
+                                </li>
+                                <li><strong>Tipo:</strong> {{ ucfirst($certificate->type) }}</li>
+                                <li><strong>Emitido el:</strong> {{ $certificate->created_at->format('d/m/Y H:i') }}</li>
                                 <li><strong>Estado:</strong> Válido</li>
                             </ul>
                         </div>
