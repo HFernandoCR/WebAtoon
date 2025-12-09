@@ -5,13 +5,8 @@
         </h2>
     </x-slot>
 
-    <div style="display: flex; min-height: calc(100vh - 65px);" class="flex-container">
-        <div class="sidebar-container" style="width: 260px; background-color: #2c3e50; color: white; flex-shrink: 0;">
-            @include('sidebar')
-        </div>
-
-        <div style="flex: 1; padding: 30px; background-color: #f3f4f6;">
-
+    <div class="p-6">
+        <div class="max-w-5xl mx-auto">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h3 style="font-size: 1.5rem; font-weight: bold; color: #2c3e50;">Todas las Notificaciones</h3>
                 <div style="display: flex; gap: 10px;">
@@ -105,7 +100,6 @@
                     </div>
                 </div>
             @endif
-
         </div>
     </div>
 </x-app-layout>

@@ -3,97 +3,119 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Crear Evento') }}</h2>
     </x-slot>
 
-    <div style="display: flex; min-height: calc(100vh - 65px);">
-        <div style="width: 260px; background-color: #2c3e50; color: white; flex-shrink: 0;">@include('sidebar')</div>
+    <div class="p-6">
+        <div class="max-w-3xl mx-auto bg-white p-6 md:p-10 rounded-lg shadow-sm">
+            <h3 class="text-xl md:text-2xl font-bold mb-6">Nuevo Evento</h3>
 
-        <div style="flex: 1; padding: 30px; background-color: #f3f4f6;">
-            <div style="max-width: 700px; background: white; padding: 40px; border-radius: 10px; margin: 0 auto;">
-                <h3 style="margin-bottom: 20px; font-weight: bold;">Nuevo Evento</h3>
+            @if($errors->any())
+                <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 mb-6 rounded">
+                    <strong>Error:</strong>
+                    <ul class="mt-1 pl-5 list-disc">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-                @if($errors->any())
-                    <div style="background-color: #f8d7da; color: #721c24; padding: 15px; margin-bottom: 20px; border-radius: 5px; border-left: 4px solid #f5c6cb;">
-                        <strong>Error:</strong>
-                        <ul style="margin: 5px 0 0 20px;">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+            <form action="{{ route('events.store') }}" method="POST">
+                @csrf
+
+                <div class="mb-4">
+                    <label class="block mb-2 font-medium">Nombre del Evento</label>
+                    <input type="text" name="name" value="{{ old('name') }}" required maxlength="255"
+                        class="w-full p-2.5 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block mb-2 font-medium">Categoría del Evento</label>
+                    <select name="category_id"
+                        class="w-full p-2.5 border border-gray-300 rounded-md bg-white focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">-- Seleccione una Categoría (Opcional) --</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
+                    <div>
+                        <label class="block mb-2 font-medium">Fecha Inicio</label>
+                        <input type="date" name="start_date" id="start_date" value="{{ old('start_date') }}" required
+                            min="{{ date('Y-m-d') }}"
+                            class="w-full p-2.5 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
                     </div>
-                @endif
-
-                <form action="{{ route('events.store') }}" method="POST">
-                    @csrf
-
-                    <div style="margin-bottom: 15px;">
-                        <label>Nombre del Evento</label>
-                        <input type="text" name="name" value="{{ old('name') }}" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <div>
+                        <label class="block mb-2 font-medium">Fecha Fin</label>
+                        <input type="date" name="end_date" id="end_date" value="{{ old('end_date') }}" required
+                            min="{{ date('Y-m-d') }}"
+                            class="w-full p-2.5 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
                     </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <label>Categoría del Evento</label>
-                        <select name="category_id" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background: white;">
-                            <option value="">-- Seleccione una Categoría (Opcional) --</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
-                        <div>
-                            <label>Fecha Inicio</label>
-                            <input type="date" name="start_date" value="{{ old('start_date') }}" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                        </div>
-                        <div>
-                            <label>Fecha Fin</label>
-                            <input type="date" name="end_date" value="{{ old('end_date') }}" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                        </div>
-                    </div>
+                </div>
 
 
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #555; font-weight: 600;">Encargado del Evento <span style="color:red">*</span></label>
-                        <select name="manager_id" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background: white;">
-                            <option value="">Seleccione un Gestor...</option>
-                            @foreach($managers as $manager)
-                                <option value="{{ $manager->id }}" {{ old('manager_id') == $manager->id ? 'selected' : '' }}>
-                                    {{ $manager->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @if($managers->isEmpty())
-                            <small style="color: red;">⚠ No hay usuarios con rol 'event_manager' registrados.</small>
-                        @endif
-                    </div>
+                <div class="mb-4">
+                    <label class="block mb-1.5 text-gray-700 font-semibold">Encargado del
+                        Evento <span class="text-red-500">*</span></label>
+                    <select name="manager_id" required
+                        class="w-full p-2.5 border border-gray-300 rounded-md bg-white focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Seleccione un Gestor...</option>
+                        @foreach($managers as $manager)
+                            <option value="{{ $manager->id }}" {{ old('manager_id') == $manager->id ? 'selected' : '' }}>
+                                {{ $manager->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @if($managers->isEmpty())
+                        <small class="text-red-500">⚠ No hay usuarios con rol 'event_manager' registrados.</small>
+                    @endif
+                </div>
 
+                <div class="mb-4">
+                    <label class="block mb-2 font-medium">Ubicación</label>
+                    <input type="text" name="location" value="{{ old('location') }}" maxlength="255"
+                        placeholder="Ej: Auditorio A"
+                        class="w-full p-2.5 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
 
+                <div class="mb-4">
+                    <label class="block mb-2 font-medium">Estado</label>
+                    <select name="status"
+                        class="w-full p-2.5 border border-gray-300 rounded-md bg-white focus:ring-indigo-500 focus:border-indigo-500">
+                        @foreach(App\Models\Event::getStatuses() as $key => $label)
+                            <option value="{{ $key }}" {{ old('status', 'registration') == $key ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-                    <div style="margin-bottom: 15px;">
-                        <label>Ubicación</label>
-                        <input type="text" name="location" value="{{ old('location') }}" placeholder="Ej: Auditorio A" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                    </div>
+                <div class="mb-4">
+                    <label class="block mb-2 font-medium">Descripción</label>
+                    <textarea name="description" rows="3"
+                        class="w-full p-2.5 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">{{ old('description') }}</textarea>
+                </div>
 
-                    <div style="margin-bottom: 15px;">
-                        <label>Estado</label>
-                        <select name="status" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                            @foreach(App\Models\Event::getStatuses() as $key => $label)
-                                <option value="{{ $key }}" {{ old('status', 'registration') == $key ? 'selected' : '' }}>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <label>Descripción</label>
-                        <textarea name="description" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">{{ old('description') }}</textarea>
-                    </div>
-
-                    <button type="submit" style="background: #2ecc71; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Guardar Evento</button>
-                </form>
-            </div>
+                <button type="submit"
+                    class="bg-green-500 hover:bg-green-600 text-white py-2.5 px-6 rounded-md font-semibold transition-colors duration-200">Guardar
+                    Evento</button>
+            </form>
         </div>
     </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const startDate = document.getElementById('start_date');
+            const endDate = document.getElementById('end_date');
+
+            startDate.addEventListener('change', function () {
+                endDate.min = this.value;
+                if (endDate.value && endDate.value < this.value) {
+                    endDate.value = this.value;
+                }
+            });
+        });
+    </script>
 </x-app-layout>

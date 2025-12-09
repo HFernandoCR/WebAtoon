@@ -3,85 +3,83 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Inscribir Proyecto') }}</h2>
     </x-slot>
 
-    <div style="display: flex; min-height: calc(100vh - 65px);">
-        <div style="width: 260px; background-color: #2c3e50; color: white; flex-shrink: 0;">@include('sidebar')</div>
+    <div class="p-6">
+        <div class="bg-white p-6 md:p-10 rounded-lg shadow-sm max-w-3xl mx-auto">
+            <h3 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-4">Ficha de Inscripción</h3>
 
-        <div style="flex: 1; padding: 30px; background-color: #f3f4f6;">
-            <div style="max-width: 700px; background: white; padding: 40px; border-radius: 10px; margin: 0 auto;">
-                <h3 style="margin-bottom: 20px; font-weight: bold; color: #2c3e50;">Ficha de Inscripción</h3>
+            <form action="{{ route('projects.store') }}" method="POST">
+                @csrf
 
-                <form action="{{ route('projects.store') }}" method="POST">
-                    @csrf
+                <div class="mb-6">
+                    <label class="block mb-2 text-gray-700 font-bold">Selecciona el Evento <span
+                            class="text-red-500">*</span></label>
+                    <select name="event_id" required
+                        class="w-full p-3 border-2 border-blue-200 rounded-md bg-blue-50 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        <option value="">-- Elige una competencia activa --</option>
+                        @foreach($activeEvents as $event)
+                            <option value="{{ $event->id }}">{{ $event->name }} (Cierra: {{ $event->end_date }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @if($activeEvents->isEmpty())
+                        <small class="text-red-500 mt-1 block font-medium">No hay eventos activos en este
+                            momento.</small>
+                    @endif
+                </div>
 
-                    <div style="margin-bottom: 20px;">
-                        <label style="font-weight: bold; display: block; margin-bottom: 5px;">Selecciona el Evento <span
-                                style="color:red">*</span></label>
-                        <select name="event_id" required
-                            style="width: 100%; padding: 12px; border: 2px solid #3498db; border-radius: 5px; background: #ebf5fb;">
-                            <option value="">-- Elige una competencia activa --</option>
-                            @foreach($activeEvents as $event)
-                                <option value="{{ $event->id }}">{{ $event->name }} (Cierra: {{ $event->end_date }})
-                                </option>
+
+                <div class="mb-6">
+                    <label class="block mb-2 text-gray-700 font-bold">Selecciona tu Asesor / Tutor</label>
+                    <select name="advisor_id"
+                        class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">-- Sin Asesor (Independiente) --</option>
+                        @foreach($advisors as $advisor)
+                            <option value="{{ $advisor->id }}">{{ $advisor->name }} ({{ $advisor->institution }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block mb-2 text-gray-700 font-bold">Nombre del Proyecto <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" name="title" required maxlength="255" placeholder="Ej: Brazo Robótico con IA"
+                        class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block mb-2 text-gray-700 font-bold">Categoría <span
+                                class="text-red-500">*</span></label>
+                        <select name="category" required
+                            class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- Selecciona una categoría --</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->code }}">{{ $cat->name }}</option>
                             @endforeach
                         </select>
-                        @if($activeEvents->isEmpty())
-                            <small style="color: red;">No hay eventos activos en este momento.</small>
-                        @endif
                     </div>
-
-
-                    <div style="margin-bottom: 20px;">
-                        <label style="font-weight: bold; display: block; margin-bottom: 5px;">Selecciona tu Asesor /
-                            Tutor</label>
-                        <select name="advisor_id"
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                            <option value="">-- Sin Asesor (Independiente) --</option>
-                            @foreach($advisors as $advisor)
-                                <option value="{{ $advisor->id }}">{{ $advisor->name }} ({{ $advisor->institution }})
-                                </option>
-                            @endforeach
-                        </select>
+                    <div>
+                        <label class="block mb-2 text-gray-700 font-bold">Enlace al Repositorio (Opcional)</label>
+                        <input type="url" name="repository_url" pattern="https?://.+"
+                            placeholder="https://github.com/..."
+                            class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
+                </div>
 
+                <div class="mb-8">
+                    <label class="block mb-2 text-gray-700 font-bold">Descripción / Abstract <span
+                            class="text-red-500">*</span></label>
+                    <textarea name="description" rows="5" required minlength="10"
+                        placeholder="Describe brevemente de qué trata tu proyecto..."
+                        class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+                </div>
 
-
-                    <div style="margin-bottom: 15px;">
-                        <label>Nombre del Proyecto</label>
-                        <input type="text" name="title" required placeholder="Ej: Brazo Robótico con IA"
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
-                        <div>
-                            <label>Categoría</label>
-                            <select name="category" required
-                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                                <option value="">-- Selecciona una categoría --</option>
-                                @foreach($categories as $cat)
-                                    <option value="{{ $cat->code }}">{{ $cat->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label>Enlace al Repositorio (Opcional)</label>
-                            <input type="url" name="repository_url" placeholder="https://github.com/..."
-                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <label>Descripción / Abstract</label>
-                        <textarea name="description" rows="5" required
-                            placeholder="Describe brevemente de qué trata tu proyecto..."
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
-                    </div>
-
-                    <button type="submit"
-                        style="background: #2ecc71; color: white; padding: 12px 25px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%;">
-                        Confirmar Inscripción
-                    </button>
-                </form>
-            </div>
+                <button type="submit"
+                    class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-md shadow-md transition-all transform hover:scale-[1.01] duration-200">
+                    Confirmar Inscripción
+                </button>
+            </form>
         </div>
     </div>
 </x-app-layout>

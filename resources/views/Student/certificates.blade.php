@@ -3,63 +3,56 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Mis Constancias') }}</h2>
     </x-slot>
 
-    <div class="flex-container" style="display: flex; min-height: calc(100vh - 65px);">
-        <div class="sidebar-container" style="width: 260px; background-color: #2c3e50; color: white; flex-shrink: 0;">
-            @include('sidebar')</div>
-
-        <div class="main-content" style="flex: 1; padding: 30px; background-color: #f3f4f6;">
-
-            @if($projects->isEmpty())
-                <div style="background: white; padding: 40px; text-align: center; border-radius: 10px;">
-                    <i class="icon-lock" style="font-size: 3rem; color: #bdc3c7;"></i>
-                    <h3 style="margin-top: 15px; color: #7f8c8d;">No hay constancias disponibles</h3>
-                    <p style="color: #999;">Aún no has participado en ningún evento o tus proyectos no han sido calificados.</p>
+    <div class="p-6">
+        @if($projects->isEmpty())
+            <div class="bg-white p-10 text-center rounded-lg shadow-sm border border-gray-100">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
+                    <i class="icon-lock text-4xl text-gray-400"></i>
                 </div>
-            @else
-                <div style="display: flex; flex-direction: column; gap: 20px;">
-                    @foreach($projects as $proj)
-                        @php
-                            // Determine availability
-                            // Available if: Status is Approved (legacy) OR Event is Finished OR Project has a score > 0
-                            // User request: "se le este agregando las nuevas cuando se le califique su proyecto"
-                            
-                            $isGraded = $proj->judges->whereNotNull('pivot.score')->count() > 0;
-                            // Also check if completely graded? User just said "califique". Let's assume mostly graded or approved.
-                            // If event is finished, definitely show.
-                            
-                            $isAvailable = $proj->status === 'approved' || 
-                                           $proj->event->status === \App\Models\Event::STATUS_FINISHED || 
-                                           $isGraded;
-                        @endphp
+                <h3 class="text-xl font-bold text-gray-600 mb-2">No hay constancias disponibles</h3>
+                <p class="text-gray-400">Aún no has participado en ningún evento o tus proyectos no han sido calificados.
+                </p>
+            </div>
+        @else
+            <div class="grid grid-cols-1 gap-6">
+                @foreach($projects as $proj)
+                    @php
+                        // Determine availability
+                        $isGraded = $proj->judges->whereNotNull('pivot.score')->count() > 0;
+                        $isAvailable = $proj->status === 'approved' ||
+                            $proj->event->status === \App\Models\Event::STATUS_FINISHED ||
+                            $isGraded;
+                    @endphp
 
-                        @if($isAvailable)
-                            <div style="background: white; padding: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid #2ecc71; flex-wrap: wrap; gap: 20px;">
-                                <div>
-                                    <h3 style="font-weight: bold; font-size: 1.2rem;">Constancia: {{ $proj->event->name }}</h3>
-                                    <p style="color: #666;">Proyecto: {{ $proj->title }}</p>
-                                    <p style="color: #999; font-size: 0.9em;">Categoría: {{ $proj->category }}</p>
-                                </div>
-                                <a href="{{ route('certificates.download', ['project_id' => $proj->id]) }}"
-                                    style="background: #2ecc71; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
-                                    <i class="icon-download"></i> Descargar PDF
-                                </a>
+                    @if($isAvailable)
+                        <div
+                            class="bg-white p-6 rounded-lg shadow-sm border-l-8 border-green-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-transform hover:scale-[1.01]">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800 mb-1">Constancia: {{ $proj->event->name }}</h3>
+                                <p class="text-gray-600 font-medium">Proyecto: {{ $proj->title }}</p>
+                                <p class="text-sm text-gray-400 mt-1">Categoría: {{ $proj->category }}</p>
                             </div>
-                        @else
-                             <div style="background: white; padding: 20px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid #bdc3c7; opacity: 0.8;">
-                                <div>
-                                    <h3 style="font-weight: bold; font-size: 1.1rem; color: #7f8c8d;">{{ $proj->event->name }} (Pendiente)</h3>
-                                    <p style="color: #999;">Proyecto: {{ $proj->title }}</p>
-                                    <small>La constancia estará disponible cuando el proyecto sea calificado o el evento finalice.</small>
-                                </div>
-                                <span style="background: #bdc3c7; color: white; padding: 8px 15px; border-radius: 5px; font-size: 0.9em;">
-                                    <i class="icon-lock"></i> Bloqueado
-                                </span>
+                            <a href="{{ route('certificates.download', ['project_id' => $proj->id]) }}"
+                                class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded shadow-sm font-bold flex items-center gap-2 transition-colors">
+                                <i class="icon-download"></i> Descargar PDF
+                            </a>
+                        </div>
+                    @else
+                        <div
+                            class="bg-white p-6 rounded-lg shadow-sm border-l-8 border-gray-300 opacity-75 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 grayscale-[50%]">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-500 mb-1">{{ $proj->event->name }} (Pendiente)</h3>
+                                <p class="text-gray-400 font-medium">Proyecto: {{ $proj->title }}</p>
+                                <small class="text-gray-400 block mt-2">La constancia estará disponible cuando el proyecto sea
+                                    calificado o el evento finalice.</small>
                             </div>
-                        @endif
-                    @endforeach
-                </div>
-            @endif
-
-        </div>
+                            <span class="bg-gray-300 text-gray-600 py-1.5 px-3 rounded text-sm font-bold flex items-center gap-2">
+                                <i class="icon-lock"></i> Bloqueado
+                            </span>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+        @endif
     </div>
 </x-app-layout>

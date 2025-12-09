@@ -18,19 +18,19 @@ class ProjectController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Project::where(function($q) {
+        $query = Project::where(function ($q) {
             $q->where('user_id', Auth::id())
-              ->orWhereHas('members', function($m) {
-                  $m->where('user_id', Auth::id());
-              });
+                ->orWhereHas('members', function ($m) {
+                    $m->where('user_id', Auth::id());
+                });
         })->with('event', 'judges');
 
         if ($request->get('status') === 'active') {
-            $query->whereHas('event', function($q) {
+            $query->whereHas('event', function ($q) {
                 $q->active();
             });
         } elseif ($request->get('status') === 'finished') {
-            $query->whereHas('event', function($q) {
+            $query->whereHas('event', function ($q) {
                 $q->finished();
             });
         }
@@ -48,16 +48,16 @@ class ProjectController extends Controller
         $this->authorize('create', Project::class);
 
         // Check for existing active projects (as author or member)
-        $existingActiveProject = Project::where(function($q) {
+        $existingActiveProject = Project::where(function ($q) {
             $q->where('user_id', Auth::id())
-              ->orWhereHas('members', function($m) {
-                  $m->where('user_id', Auth::id())->where('status', 'accepted');
-              });
+                ->orWhereHas('members', function ($m) {
+                    $m->where('user_id', Auth::id())->where('status', 'accepted');
+                });
         })
-        ->whereHas('event', function ($query) {
-            $query->active();
-        })
-        ->first();
+            ->whereHas('event', function ($query) {
+                $query->active();
+            })
+            ->first();
 
         if ($existingActiveProject) {
             return redirect()->route('projects.index')->with('error', 'Ya tienes un proyecto activo (' . $existingActiveProject->title . '). No puedes registrar otro hasta que el evento finalice.');
@@ -77,32 +77,24 @@ class ProjectController extends Controller
     /**
      * Guardar el proyecto.
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\StoreProjectRequest $request)
     {
         $this->authorize('create', Project::class);
-        $request->validate([
-            'title' => 'required|max:255',
-            'event_id' => 'required|exists:events,id',
-            'advisor_id' => 'nullable|exists:users,id',
-            'category' => 'required|exists:categories,code',
-            'description' => 'required',
-            'repository_url' => 'nullable|url'
-        ]);
 
         $event = Event::findOrFail($request->event_id);
         $now = now();
 
         // Check for existing active projects (as author or member)
-        $existingActiveProject = Project::where(function($q) {
+        $existingActiveProject = Project::where(function ($q) {
             $q->where('user_id', Auth::id())
-              ->orWhereHas('members', function($m) {
-                  $m->where('user_id', Auth::id())->where('status', 'accepted');
-              });
+                ->orWhereHas('members', function ($m) {
+                    $m->where('user_id', Auth::id())->where('status', 'accepted');
+                });
         })
-        ->whereHas('event', function ($query) {
-             $query->active();
-        })
-        ->first();
+            ->whereHas('event', function ($query) {
+                $query->active();
+            })
+            ->first();
 
         if ($existingActiveProject) {
             return back()->withErrors(['error' => 'Ya tienes un proyecto activo en curso. Solo puedes registrar un nuevo proyecto cuando el evento actual haya finalizado.']);
@@ -199,15 +191,9 @@ class ProjectController extends Controller
         return view('Student.projects.edit', compact('project', 'activeEvents', 'categories'));
     }
 
-    public function update(Request $request, Project $project)
+    public function update(\App\Http\Requests\UpdateProjectRequest $request, Project $project)
     {
         $this->authorize('update', $project);
-
-        $request->validate([
-            'title' => 'required|max:255',
-            'category' => 'required|exists:categories,code',
-            'description' => 'required',
-        ]);
 
         $event = $project->event;
         $now = now();
@@ -258,16 +244,16 @@ class ProjectController extends Controller
         // Prioritize ACTIVE project.
         // If the student has a finished project but no active one, we show NOTHING (or handle in view).
         // The user specifically requested: "haz que cuando un equipo de un proyecto finalizado ya no salga"
-        $project = Project::where(function($q) {
+        $project = Project::where(function ($q) {
             $q->where('user_id', Auth::id())
-              ->orWhereHas('members', function($m) {
-                  $m->where('user_id', Auth::id())->where('status', 'accepted');
-              });
+                ->orWhereHas('members', function ($m) {
+                    $m->where('user_id', Auth::id())->where('status', 'accepted');
+                });
         })
-        ->whereHas('event', function ($query) {
-            $query->active();
-        })
-        ->first();
+            ->whereHas('event', function ($query) {
+                $query->active();
+            })
+            ->first();
 
         return view('Student.team', compact('project'));
     }
@@ -281,20 +267,20 @@ class ProjectController extends Controller
         // Actually, let's just fetch all and let the view filter/show locked states if we want, 
         // OR filtering here is cleaner.
         // Let's filter here: Projects that are Approved OR have a score.
-        
-        $projects = Project::where(function($q) {
-                $q->where('user_id', Auth::id())
-                  ->orWhereHas('members', function($m) {
-                      $m->where('user_id', Auth::id());
-                  });
-            })
+
+        $projects = Project::where(function ($q) {
+            $q->where('user_id', Auth::id())
+                ->orWhereHas('members', function ($m) {
+                    $m->where('user_id', Auth::id());
+                });
+        })
             ->with(['event', 'judges'])
             ->get();
-            
+
         // We will filter visible certificates in the view or here.
         // Let's pass all projects so we can show "Pending" or "Locked" states if we want, 
         // but user just said "show all".
-        
+
         return view('Student.certificates', compact('projects'));
     }
 

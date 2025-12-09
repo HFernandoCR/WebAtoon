@@ -5,46 +5,39 @@
         </h2>
     </x-slot>
 
-    <div style="display: flex; min-height: calc(100vh - 65px);">
-        <div style="width: 260px; background-color: #2c3e50; color: white; flex-shrink: 0;">
-            @include('sidebar')
-        </div>
+    <div class="p-6">
 
-        <div style="flex: 1; padding: 30px; background-color: #f3f4f6;">
-
-            <div style="background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                <strong>Información</strong>
-                <p style="margin: 5px 0 0 0; color: #1565c0;">Esta tabla muestra qué permisos tiene asignado cada rol en el sistema. Los permisos se configuraron en el seeder inicial.</p>
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded shadow-sm">
+                <strong class="text-blue-700 block mb-1">Información</strong>
+                <p class="text-blue-600 text-sm">Esta tabla muestra qué permisos tiene asignado cada rol en el sistema. Los permisos se configuraron en el seeder inicial.</p>
             </div>
 
-            <div style="background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow-x: auto;">
-                <h3 style="font-size: 1.3rem; font-weight: bold; color: #2c3e50; margin-bottom: 20px;">Matriz de Permisos</h3>
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6 overflow-x-auto">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 border-b pb-4">Matriz de Permisos</h3>
 
-                <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
-                    <thead style="background-color: #f8f9fa;">
-                        <tr>
-                            <th style="padding: 15px; text-align: left; border-bottom: 2px solid #dee2e6; font-weight: 600; color: #495057;">
-                                Permiso / Rol
-                            </th>
+                <table class="w-full text-left border-collapse min-w-[800px]">
+                    <thead>
+                        <tr class="bg-gray-50 border-b-2 border-gray-200">
+                            <th class="p-3 font-semibold text-gray-600">Permiso / Rol</th>
                             @foreach($roles as $role)
-                                <th style="padding: 15px; text-align: center; border-bottom: 2px solid #dee2e6; font-weight: 600; color: #495057;">
+                                <th class="p-3 font-semibold text-gray-600 text-center">
                                     {{ ucfirst(str_replace('_', ' ', $role->name)) }}
                                 </th>
                             @endforeach
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-gray-100">
                         @foreach($permissions as $permission)
-                            <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 12px; font-weight: 500; color: #2c3e50;">
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="p-3 font-medium text-slate-700">
                                     {{ ucfirst(str_replace('-', ' ', $permission->name)) }}
                                 </td>
                                 @foreach($roles as $role)
-                                    <td style="padding: 12px; text-align: center;">
+                                    <td class="p-3 text-center">
                                         @if($matrix[$role->name][$permission->name])
-                                            <span style="color: #2ecc71; font-size: 1.5em;">✓</span>
+                                            <span class="text-green-500 text-xl font-bold">✓</span>
                                         @else
-                                            <span style="color: #e74c3c; font-size: 1.2em;">✗</span>
+                                            <span class="text-red-400 text-lg">✗</span>
                                         @endif
                                     </td>
                                 @endforeach
@@ -54,47 +47,26 @@
                 </table>
             </div>
 
-            <div style="background: white; border-radius: 10px; padding: 20px; margin-top: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <h3 style="font-size: 1.2rem; font-weight: bold; color: #2c3e50; margin-bottom: 15px;">Descripción de Permisos</h3>
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 border-b pb-4">Descripción de Permisos</h3>
 
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     @foreach($permissions as $permission)
-                        <div style="border-left: 3px solid #3498db; padding-left: 10px;">
-                            <strong style="color: #2c3e50;">{{ $permission->name }}</strong>
-                            <p style="margin: 5px 0 0 0; color: #7f8c8d; font-size: 0.9em;">
+                        <div class="border-l-4 border-blue-400 pl-4 py-1 bg-blue-50/50 rounded-r">
+                            <strong class="text-slate-800 block">{{ $permission->name }}</strong>
+                            <p class="text-slate-600 text-sm mt-1">
                                 @switch($permission->name)
-                                    @case('manage-users')
-                                        Crear, editar y eliminar usuarios
-                                        @break
-                                    @case('manage-events')
-                                        Gestionar eventos académicos
-                                        @break
-                                    @case('view-all-data')
-                                        Ver todos los datos del sistema
-                                        @break
-                                    @case('manage-projects')
-                                        Gestionar proyectos del evento
-                                        @break
-                                    @case('assign-judges')
-                                        Asignar jueces a proyectos
-                                        @break
-                                    @case('evaluate-projects')
-                                        Evaluar y calificar proyectos
-                                        @break
-                                    @case('view-advised-projects')
-                                        Ver proyectos asesorados
-                                        @break
-                                    @case('manage-own-projects')
-                                        Gestionar proyectos propios
-                                        @break
-                                    @case('manage-team')
-                                        Gestionar equipo de trabajo
-                                        @break
-                                    @case('upload-deliverables')
-                                        Subir entregables del proyecto
-                                        @break
-                                    @default
-                                        Permiso del sistema
+                                    @case('manage-users') Crear, editar y eliminar usuarios @break
+                                    @case('manage-events') Gestionar eventos académicos @break
+                                    @case('view-all-data') Ver todos los datos del sistema @break
+                                    @case('manage-projects') Gestionar proyectos del evento @break
+                                    @case('assign-judges') Asignar jueces a proyectos @break
+                                    @case('evaluate-projects') Evaluar y calificar proyectos @break
+                                    @case('view-advised-projects') Ver proyectos asesorados @break
+                                    @case('manage-own-projects') Gestionar proyectos propios @break
+                                    @case('manage-team') Gestionar equipo de trabajo @break
+                                    @case('upload-deliverables') Subir entregables del proyecto @break
+                                    @default Permiso del sistema
                                 @endswitch
                             </p>
                         </div>
@@ -102,6 +74,5 @@
                 </div>
             </div>
 
-        </div>
     </div>
 </x-app-layout>

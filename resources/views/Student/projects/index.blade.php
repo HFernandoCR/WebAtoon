@@ -3,110 +3,103 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Mi Competencia') }}</h2>
     </x-slot>
 
-    <div style="display: flex; min-height: calc(100vh - 65px);" class="flex-container">
-        <div class="sidebar-container" style="width: 260px; background-color: #2c3e50; color: white; flex-shrink: 0;">
-            @include('sidebar')
-        </div>
+    <div class="p-6">
 
-        <div style="flex: 1; padding: 30px; background-color: #f3f4f6;">
-
-            <!-- Filters and Action -->
-            <div class="mb-4 flex justify-between items-center">
-                <div class="flex space-x-2">
-                    <a href="{{ route('projects.index') }}" 
-                       class="px-4 py-2 rounded-lg text-sm font-medium {{ !request('status') ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50' }}">
-                       Todos
-                    </a>
-                    <a href="{{ route('projects.index', ['status' => 'active']) }}" 
-                       class="px-4 py-2 rounded-lg text-sm font-medium {{ request('status') === 'active' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50' }}">
-                       Activos
-                    </a>
-                    <a href="{{ route('projects.index', ['status' => 'finished']) }}" 
-                       class="px-4 py-2 rounded-lg text-sm font-medium {{ request('status') === 'finished' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50' }}">
-                       Finalizados
-                    </a>
-                </div>
-
-                <a href="{{ route('projects.create') }}"
-                    style="background-color: #2ecc71; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
-                    🚀 Inscribir Nuevo Proyecto
+        <!-- Filters and Action -->
+        <div class="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex space-x-2 bg-white p-1 rounded-lg shadow-sm">
+                <a href="{{ route('projects.index') }}"
+                    class="px-4 py-2 rounded-md text-sm font-medium transition-colors {{ !request('status') ? 'bg-blue-500 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100' }}">
+                    Todos
+                </a>
+                <a href="{{ route('projects.index', ['status' => 'active']) }}"
+                    class="px-4 py-2 rounded-md text-sm font-medium transition-colors {{ request('status') === 'active' ? 'bg-blue-500 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100' }}">
+                    Activos
+                </a>
+                <a href="{{ route('projects.index', ['status' => 'finished']) }}"
+                    class="px-4 py-2 rounded-md text-sm font-medium transition-colors {{ request('status') === 'finished' ? 'bg-blue-500 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100' }}">
+                    Finalizados
                 </a>
             </div>
 
-            <div
-                style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead style="background-color: #f8f9fa;">
-                        <tr>
-                            <th style="padding: 15px; text-align: left;">Proyecto</th>
-                            <th style="padding: 15px; text-align: left;">Evento</th>
-                            <th style="padding: 15px; text-align: left;">Categoría</th>
-                            <th style="padding: 15px; text-align: center;">Calificación</th>
-                            <th style="padding: 15px; text-align: left;">Estado</th>
+            <a href="{{ route('projects.create') }}"
+                class="bg-green-500 hover:bg-green-600 text-white px-6 py-2.5 rounded-md font-bold shadow transition-colors flex items-center gap-2">
+                <span>🚀</span> Inscribir Nuevo Proyecto
+            </a>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-200 text-gray-600">
+                            <th class="p-4 font-semibold">Proyecto</th>
+                            <th class="p-4 font-semibold">Evento</th>
+                            <th class="p-4 font-semibold">Categoría</th>
+                            <th class="p-4 font-semibold text-center">Calificación</th>
+                            <th class="p-4 font-semibold">Estado</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-gray-100">
                         @foreach($projects as $project)
-                            <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 15px;">
-                                    <strong>{{ $project->title }}</strong><br>
-                                    <small style="color: #7f8c8d;">{{ Str::limit($project->description, 50) }}</small>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="p-4">
+                                    <div class="font-bold text-slate-800 text-lg">{{ $project->title }}</div>
+                                    <div class="text-sm text-gray-500 mt-1">{{ Str::limit($project->description, 60) }}
+                                    </div>
                                 </td>
-                                <td style="padding: 15px;">
-                                    <i class="icon-calendar"></i> {{ $project->event->name }}
+                                <td class="p-4 text-gray-600">
+                                    <div class="flex items-center gap-2">
+                                        <i class="icon-calendar text-gray-400"></i>
+                                        {{ $project->event->name }}
+                                    </div>
                                 </td>
-                                <td style="padding: 15px;">
+                                <td class="p-4">
                                     <span
-                                        style="background: #3498db; color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.8em; text-transform: uppercase;">
+                                        class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
                                         {{ $project->category }}
                                     </span>
                                 </td>
 
-                                <td style="padding: 15px; text-align: center;">
+                                <td class="p-4 text-center">
                                     @php
-                                        // Contamos jueces totales y cuántos han calificado
                                         $judgesCount = $project->judges->count();
                                         $gradedCount = $project->judges->whereNotNull('pivot.score')->count();
                                         $average = $project->judges->avg('pivot.score');
-
-                                        // Preparamos los comentarios para el botón de alerta
-                                        // pluck saca solo los textos, filter quita vacíos, join los une
                                         $feedbacks = $project->judges->pluck('pivot.feedback')->filter()->join(" | ");
                                     @endphp
 
                                     @if($judgesCount > 0 && $gradedCount == $judgesCount)
-                                        <div>
-                                            <span style="font-size: 1.1em; font-weight: bold; color: #2c3e50;">
+                                        <div class="flex flex-col items-center">
+                                            <span class="text-lg font-bold text-slate-800">
                                                 {{ number_format($average, 1) }} / 100
                                             </span>
-                                            <br>
-                                            <small style="color: #2ecc71; font-weight: bold;">Evaluación Completa</small>
+                                            <span class="text-xs font-bold text-green-500 mt-1">Evaluación Completa</span>
 
                                             @if(!empty($feedbacks))
-                                                <br>
                                                 <button onclick="showAlert('Feedback de Jueces', `{{ $feedbacks }}`)"
-                                                    style="font-size: 0.8em; color: #3498db; text-decoration: underline; background: none; border: none; cursor: pointer; margin-top: 5px;">
+                                                    class="text-xs text-blue-500 hover:text-blue-700 underline mt-1 bg-transparent border-none cursor-pointer">
                                                     Ver Feedback
                                                 </button>
                                             @endif
                                         </div>
                                     @elseif($gradedCount > 0)
-                                        <span style="color: #f39c12; font-size: 0.9em; font-weight: bold;">
+                                        <span class="text-amber-500 text-sm font-bold">
                                             En curso ({{ $gradedCount }}/{{ $judgesCount }})
                                         </span>
                                     @else
-                                        <span style="color: #95a5a6; font-size: 0.9em;">-</span>
+                                        <span class="text-gray-400">-</span>
                                     @endif
                                 </td>
-                                <td style="padding: 15px;">
+                                <td class="p-4">
                                     @php
                                         $isEventFinished = $project->event->status === \App\Models\Event::STATUS_FINISHED;
 
-                                        $statusColor = match (true) {
-                                            $isEventFinished => '#95a5a6', // Gray for finished
-                                            $project->status === 'approved' => '#2ecc71',
-                                            $project->status === 'rejected' => '#e74c3c',
-                                            default => '#f1c40f',
+                                        $statusClasses = match (true) {
+                                            $isEventFinished => 'bg-gray-200 text-gray-600',
+                                            $project->status === 'approved' => 'bg-green-100 text-green-700',
+                                            $project->status === 'rejected' => 'bg-red-100 text-red-700',
+                                            default => 'bg-yellow-100 text-yellow-800',
                                         };
                                         $statusLabel = match (true) {
                                             $isEventFinished => 'Finalizado',
@@ -115,8 +108,7 @@
                                             default => 'En Revisión',
                                         };
                                     @endphp
-                                    <span
-                                        style="background-color: {{ $statusColor }}; color: white; padding: 4px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold;">
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold {{ $statusClasses }}">
                                         {{ $statusLabel }}
                                     </span>
                                 </td>
@@ -124,13 +116,14 @@
                         @endforeach
                     </tbody>
                 </table>
+
                 @if($projects->isEmpty())
-                    <div style="padding: 30px; text-align: center; color: #7f8c8d;">
-                        <p>No se encontraron proyectos con el criterio seleccionado.</p>
+                    <div class="p-12 text-center text-gray-500">
+                        <p class="text-lg mb-4">No se encontraron proyectos con el criterio seleccionado.</p>
                         @if(!request('status'))
-                             <br>
-                             <a href="{{ route('projects.create') }}"
-                                style="color: #3498db; text-decoration: underline;">¡Inscríbete en un evento ahora!</a>
+                            <a href="{{ route('projects.create') }}"
+                                class="text-blue-500 hover:text-blue-600 underline font-medium">¡Inscríbete en un evento
+                                ahora!</a>
                         @endif
                     </div>
                 @else

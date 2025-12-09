@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use App\Models\Project;
 
 class CertificateController extends Controller
@@ -35,11 +36,11 @@ class CertificateController extends Controller
             if ($projectId) {
                 // Verify owner or member
                 $project = Project::where('id', $projectId)
-                    ->where(function($q) use ($user) {
+                    ->where(function ($q) use ($user) {
                         $q->where('user_id', $user->id)
-                          ->orWhereHas('members', function ($m) use ($user) {
-                              $m->where('user_id', $user->id);
-                          });
+                            ->orWhereHas('members', function ($m) use ($user) {
+                                $m->where('user_id', $user->id);
+                            });
                     })
                     ->first();
             } else {
@@ -85,8 +86,23 @@ class CertificateController extends Controller
         }
 
         // URL de validación del certificado (incluye folio para verificación futura)
-        $folio = 'CONST-' . strtoupper(substr($user->getRoleNames()->first(), 0, 3)) . '-' . str_pad($user->id, 5, '0', STR_PAD_LEFT) . '-' . now()->format('Y');
-        $validationUrl = config('app.url') . '/validate-certificate?folio=' . $folio;
+        // Check if certificate already exists
+        $certType = $user->hasRole('advisor') ? 'advisor' : 'participation';
+
+        $certificate = \App\Models\Certificate::firstOrCreate(
+            [
+                'user_id' => $user->id,
+                'project_id' => $project->id,
+                'type' => $certType
+            ],
+            [
+                'uuid' => 'CONST-' . strtoupper(substr($certType, 0, 3)) . '-' . str_pad($user->id, 5, '0', STR_PAD_LEFT) . '-' . now()->format('Y') . '-' . Str::random(4),
+                'issued_at' => now(),
+            ]
+        );
+
+        $folio = $certificate->uuid;
+        $validationUrl = route('certificate.validate', ['folio' => $folio]);
 
         // Generar QR en formato SVG (base64 para incrustar)
         // Usamos SVG para no depender de la extensión ImageMagick

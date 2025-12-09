@@ -14,18 +14,18 @@
         </div>
     </x-slot>
 
-    <div class="min-h-screen bg-[#bfdbfe] py-12">
+    <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white/30 backdrop-blur-md shadow-lg rounded-xl overflow-hidden mt-6">
-                <div class="p-12 text-center">
-                    <h3 class="text-2xl font-bold text-indigo-900 mb-2">{{ __('No Active Events') }}</h3>
-                    <p class="text-indigo-800 mb-6 font-medium">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 bg-white border-b border-gray-200 text-center">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ __('No Active Events') }}</h3>
+                    <p class="text-gray-500 mb-6">
                         {{ __('There are currently no events available to display rankings for.') }}
                     </p>
 
-                    @if(auth()->user()->role === 'admin' || auth()->user()->role === 'manager')
+                    @if(auth()->user()->hasRole(['admin', 'event_manager']))
                         <a href="{{ route('events.create') }}"
-                            class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-600 focus:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             {{ __('Create Event') }}
                         </a>
                     @endif

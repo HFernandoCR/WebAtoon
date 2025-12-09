@@ -5,95 +5,80 @@
         </h2>
     </x-slot>
 
-    <div style="display: flex; min-height: calc(100vh - 65px);" class="flex-container">
-        <div class="sidebar-container" style="width: 260px; background-color: #2c3e50; color: white; flex-shrink: 0;">
-            @include('sidebar')
+    <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold text-slate-800">Listado de Usuarios</h3>
+            <a href="{{ route('users.create') }}"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded shadow transition-colors duration-200">
+                + Nuevo Usuario
+            </a>
         </div>
 
-        <div style="flex: 1; padding: 30px; background-color: #f3f4f6; overflow-y: auto;">
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="font-size: 1.5rem; font-weight: bold; color: #2c3e50; margin: 0;">Listado de Usuarios</h3>
-                <a href="{{ route('users.create') }}"
-                    style="background-color: #3498db; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: 600; transition: background 0.3s;">
-                    + Nuevo Usuario
-                </a>
+        @if(session('success'))
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm" role="alert">
+                {{ session('success') }}
             </div>
+        @endif
 
-            @if(session('success'))
-                <div
-                    style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 5px solid #2ecc71;">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            <div
-                style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
-                        <thead style="background-color: #f8f9fa; border-bottom: 2px solid #e9ecef;">
-                            <tr>
-                                <th style="padding: 15px; text-align: left; color: #6c757d; font-weight: 600;">Nombre
-                                </th>
-                                <th style="padding: 15px; text-align: left; color: #6c757d; font-weight: 600;">Email
-                                </th>
-                                <th style="padding: 15px; text-align: left; color: #6c757d; font-weight: 600;">Rol</th>
-                                <th style="padding: 15px; text-align: left; color: #6c757d; font-weight: 600;">
-                                    Institución
-                                </th>
-                                <th style="padding: 15px; text-align: center; color: #6c757d; font-weight: 600;">
-                                    Acciones
-                                </th>
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50 border-b border-gray-200 text-gray-600">
+                        <tr>
+                            <th class="p-4 font-semibold uppercase text-sm tracking-wide">Nombre</th>
+                            <th class="p-4 font-semibold uppercase text-sm tracking-wide">Email</th>
+                            <th class="p-4 font-semibold uppercase text-sm tracking-wide">Rol</th>
+                            <th class="p-4 font-semibold uppercase text-sm tracking-wide">Institución</th>
+                            <th class="p-4 font-semibold uppercase text-sm tracking-wide text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @foreach($users as $user)
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                <td class="p-4 font-medium text-gray-800">{{ $user->name }}</td>
+                                <td class="p-4 text-gray-600">{{ $user->email }}</td>
+                                <td class="p-4">
+                                    @php
+                                        $colors = [
+                                            'admin' => 'bg-red-100 text-red-700',
+                                            'event_manager' => 'bg-purple-100 text-purple-700',
+                                            'judge' => 'bg-orange-100 text-orange-700',
+                                            'advisor' => 'bg-blue-100 text-blue-700',
+                                            'student' => 'bg-green-100 text-green-700'
+                                        ];
+                                        $role = $user->getRoleNames()->first() ?? 'N/A';
+                                        $colorClass = $colors[$role] ?? 'bg-gray-200 text-gray-700';
+                                    @endphp
+                                    <span
+                                        class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide {{ $colorClass }}">
+                                        {{ ucfirst(str_replace('_', ' ', $role)) }}
+                                    </span>
+                                </td>
+                                <td class="p-4 text-gray-500">{{ $user->institution ?? 'N/A' }}</td>
+                                <td class="p-4 text-center">
+                                    <div class="flex justify-center items-center gap-3">
+                                        <a href="{{ route('users.edit', $user) }}"
+                                            class="text-amber-500 hover:text-amber-600 font-bold transition-colors">Editar</a>
+                                        <form action="{{ route('users.destroy', $user) }}" method="POST"
+                                            onsubmit="return confirmAction(event, '¿Eliminar Usuario?', 'Se eliminará el usuario {{ $user->name }} y todos sus datos relacionados.', 'Sí, eliminar')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit"
+                                                class="text-red-500 hover:text-red-600 font-bold bg-transparent border-none cursor-pointer transition-colors">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($users as $user)
-                                <tr style="border-bottom: 1px solid #eee; transition: background 0.2s;">
-                                    <td style="padding: 15px;"><strong>{{ $user->name }}</strong></td>
-                                    <td style="padding: 15px;">{{ $user->email }}</td>
-                                    <td style="padding: 15px;">
-                                        @php
-                                            $colors = [
-                                                'admin' => '#e74c3c',
-                                                'event_manager' => '#9b59b6',
-                                                'judge' => '#f39c12',
-                                                'advisor' => '#3498db',
-                                                'student' => '#2ecc71'
-                                            ];
-                                            $role = $user->getRoleNames()->first() ?? 'N/A';
-                                            $color = $colors[$role] ?? '#95a5a6';
-                                        @endphp
-                                        <span
-                                            style="background-color: {{ $color }}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75em; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">
-                                            {{ ucfirst(str_replace('_', ' ', $role)) }}
-                                        </span>
-                                    </td>
-                                    <td style="padding: 15px; color: #7f8c8d;">{{ $user->institution ?? 'N/A' }}</td>
-                                    <td style="padding: 15px; text-align: center;">
-                                        <div style="display: flex; justify-content: center; gap: 15px;">
-                                            <a href="{{ route('users.edit', $user) }}"
-                                                style="color: #f39c12; font-weight: 600; text-decoration: none;">Editar</a>
-                                            <form action="{{ route('users.destroy', $user) }}" method="POST"
-                                                onsubmit="return confirmAction(event, '¿Eliminar Usuario?', 'Se eliminará el usuario {{ $user->name }} y todos sus datos relacionados.', 'Sí, eliminar')">
-                                                @csrf @method('DELETE')
-                                                <button type="submit"
-                                                    style="color: #e74c3c; background: none; border: none; font-weight: 600; cursor: pointer; padding: 0;">Eliminar</button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                @if($users->isEmpty())
-                    <div style="padding: 20px; text-align: center; color: #999;">No hay usuarios registrados aún.</div>
-                @endif
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
+            @if($users->isEmpty())
+                <div class="p-8 text-center text-gray-500">No hay usuarios registrados aún.</div>
+            @endif
+        </div>
 
-            <div style="margin-top: 20px;">
-                {{ $users->links() }}
-            </div>
+        <div class="mt-6">
+            {{ $users->links() }}
         </div>
     </div>
 </x-app-layout>

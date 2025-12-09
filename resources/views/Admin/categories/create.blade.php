@@ -5,41 +5,46 @@
         </h2>
     </x-slot>
 
-    <div style="display: flex; min-height: calc(100vh - 65px);">
-        <div style="width: 260px; background-color: #2c3e50; color: white; flex-shrink: 0;">
-            @include('sidebar')
-        </div>
+    <div class="p-6">
+        <div class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-sm">
+            <h3 class="text-xl font-bold text-slate-800 mb-6 border-b pb-4">Crear Categoría</h3>
 
-        <div style="flex: 1; padding: 30px; background-color: #f3f4f6;">
-            <div class="card" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto;">
-                <h3 style="font-size: 1.2rem; font-weight: bold; color: #2c3e50; margin-bottom: 20px;">Crear Categoría</h3>
+            <form action="{{ route('categories.store') }}" method="POST">
+                @csrf
 
-                <form action="{{ route('categories.store') }}" method="POST">
-                    @csrf
+                <div class="mb-5">
+                    <label class="block mb-2 font-semibold text-gray-700">Código (Único)</label>
+                    <input type="text" name="code" required
+                        class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400"
+                        placeholder="ej: software">
+                    @error('code') <small class="text-red-500 mt-1 block">{{ $message }}</small> @enderror
+                </div>
 
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Código (Único)</label>
-                        <input type="text" name="code" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" placeholder="ej: software">
-                        @error('code') <small style="color: red;">{{ $message }}</small> @enderror
-                    </div>
+                <div class="mb-5">
+                    <label class="block mb-2 font-semibold text-gray-700">Nombre</label>
+                    <input type="text" name="name" required
+                        class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400"
+                        placeholder="ej: Software / Apps">
+                    @error('name') <small class="text-red-500 mt-1 block">{{ $message }}</small> @enderror
+                </div>
 
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nombre</label>
-                        <input type="text" name="name" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" placeholder="ej: Software / Apps">
-                        @error('name') <small style="color: red;">{{ $message }}</small> @enderror
-                    </div>
+                <div class="mb-6">
+                    <label class="block mb-2 font-semibold text-gray-700">Descripción</label>
+                    <textarea name="description" rows="3"
+                        class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors resize-y"></textarea>
+                </div>
 
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Descripción</label>
-                        <textarea name="description" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
-                    </div>
-
-                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                        <a href="{{ route('categories.index') }}" style="padding: 10px 20px; background: #95a5a6; color: white; border-radius: 5px; text-decoration: none;">Cancelar</a>
-                        <button type="submit" style="padding: 10px 20px; background: #2ecc71; color: white; border: none; border-radius: 5px; cursor: pointer;">Guardar</button>
-                    </div>
-                </form>
-            </div>
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                    <a href="{{ route('categories.index') }}"
+                        class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-5 rounded-md shadow-sm transition-colors duration-200">
+                        Cancelar
+                    </a>
+                    <button type="submit"
+                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-md shadow-sm transition-colors duration-200">
+                        Guardar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </x-app-layout>

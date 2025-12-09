@@ -31,17 +31,10 @@ class EventController extends Controller
         return view('Admin.events.create', compact('managers', 'categories'));
     }
 
-    public function store(Request $request)
+    public function store(\App\Http\Requests\StoreEventRequest $request)
     {
         $this->authorize('create', Event::class);
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'manager_id' => 'required|exists:users,id',
-            'category_id' => 'nullable|exists:categories,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'status' => 'required|in:' . Event::STATUS_REGISTRATION . ',' . Event::STATUS_IN_PROGRESS . ',' . Event::STATUS_FINISHED
-        ]);
+
 
         $manager = User::find($request->input('manager_id'));
         if (!$manager || !$manager->hasRole('event_manager')) {
