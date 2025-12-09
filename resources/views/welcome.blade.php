@@ -152,6 +152,12 @@
             font-size: 32px;
         }
 
+        .navbar {
+            padding: 15px 20px;
+            flex-direction: column;
+            gap: 15px;
+        }
+
         .cards-container {
             flex-direction: column;
         }
@@ -166,7 +172,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webathon Inicio</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/estiloprincipal.css') }}">
 
     <style>
         .auth-buttons {
