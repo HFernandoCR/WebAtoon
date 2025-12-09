@@ -15,6 +15,18 @@ class RankingService
     {
         // 1. Obtener todas las evaluaciones del proyecto
         // Ojo: En la tabla pivote 'project_judge', el campo 'score' es la calificación final dada por el juez
+
+        $completedEvaluations = DB::table('project_judge')
+            ->where('project_id', $project->id)
+            ->whereNotNull('score')
+            ->count();
+
+        // Validación: Solo calcular promedio si hay exactamente 3 evaluaciones
+        if ($completedEvaluations < 3) {
+            $project->update(['average_score' => 0]);
+            return 0;
+        }
+
         $average = DB::table('project_judge')
             ->where('project_id', $project->id)
             ->whereNotNull('score')

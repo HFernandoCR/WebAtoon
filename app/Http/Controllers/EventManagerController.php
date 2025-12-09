@@ -24,7 +24,7 @@ class EventManagerController extends Controller
             // Check if they have a finished event
             $finishedEvent = Event::where('manager_id', Auth::id())->finished()->first();
             if ($finishedEvent) {
-                 return view('Manager.event-finished', ['event' => $finishedEvent]);
+                return view('Manager.event-finished', ['event' => $finishedEvent]);
             }
             return view('Manager.no-event');
         }
@@ -89,7 +89,7 @@ class EventManagerController extends Controller
 
         // 2. Prevent editing if event is finished
         if ($project->event->status === Event::STATUS_FINISHED) {
-             abort(403, 'El evento ha finalizado. No se pueden asignar jueces.');
+            abort(403, 'El evento ha finalizado. No se pueden asignar jueces.');
         }
 
         $this->authorize('update', $project->event);
@@ -98,16 +98,16 @@ class EventManagerController extends Controller
         // Note: We exclude the current project's assignments from 'available' naturally via diff, 
         // but we mainly want to exclude judges busy with OTHER active projects.
         $allJudges = User::role('judge')
-            ->whereDoesntHave('judgedProjects', function($query) {
+            ->whereDoesntHave('judgedProjects', function ($query) {
                 // Check if they have any project that belongs to an ACTIVE event
-                $query->whereHas('event', function($q) {
+                $query->whereHas('event', function ($q) {
                     $q->active();
                 });
             })
             ->get();
 
         $assignedJudges = $project->judges;
-        
+
         // Available = Valid Judges minus those already assigned to THIS project
         // (The query above already filtered out judges busy with *other* active projects. 
         // If a judge is assigned to *this* project (which is active), they are 'busy' but also 'assigned', so they appear in assigned list)
@@ -123,7 +123,7 @@ class EventManagerController extends Controller
         }
 
         if ($project->event->status === Event::STATUS_FINISHED) {
-             abort(403, 'El evento ha finalizado. No se pueden asignar jueces.');
+            abort(403, 'El evento ha finalizado. No se pueden asignar jueces.');
         }
 
         $this->authorize('update', $project->event);
@@ -137,9 +137,14 @@ class EventManagerController extends Controller
             return back()->with('error', 'El usuario seleccionado no tiene rol de Juez.');
         }
 
+        // Validación: Máximo 3 jueces por proyecto
+        if ($project->judges()->count() >= 3) {
+            return back()->with('error', 'El proyecto ya cuenta con el máximo de 3 jueces asignados.');
+        }
+
         // Validate Judge Availability
         $isBusy = $judge->judgedProjects()
-            ->whereHas('event', function($q) {
+            ->whereHas('event', function ($q) {
                 $q->active();
             })
             ->exists();
@@ -172,7 +177,7 @@ class EventManagerController extends Controller
         }
 
         if ($project->event->status === Event::STATUS_FINISHED) {
-             abort(403, 'El evento ha finalizado. No se pueden remover jueces.');
+            abort(403, 'El evento ha finalizado. No se pueden remover jueces.');
         }
 
         $this->authorize('update', $project->event);
@@ -195,11 +200,11 @@ class EventManagerController extends Controller
             // If no active event, check if there is a finished one to show the read-only view
             $finishedEvent = Event::where('manager_id', Auth::id())->finished()->first();
             if ($finishedEvent) {
-                 return view('Manager.event-finished', ['event' => $finishedEvent]);
+                return view('Manager.event-finished', ['event' => $finishedEvent]);
             }
             return redirect()->route('manager.dashboard')->with('error', 'No tienes eventos asignados.');
         }
-        
+
         return view('Manager.event.edit', compact('event'));
     }
 
@@ -210,12 +215,12 @@ class EventManagerController extends Controller
 
         // Safety check: if they somehow posted to update a finished event (should be blocked by view, but distinct check here)
         if (!$event) {
-             // Check if they are trying to update a finished event
-             $finishedEvent = Event::where('manager_id', Auth::id())->finished()->first();
-             if ($finishedEvent) {
-                 abort(403, 'El evento ha finalizado y no se puede editar. Contacta al administrador si necesitas reactivarlo.');
-             }
-             abort(404, 'No se encontró el evento activo.');
+            // Check if they are trying to update a finished event
+            $finishedEvent = Event::where('manager_id', Auth::id())->finished()->first();
+            if ($finishedEvent) {
+                abort(403, 'El evento ha finalizado y no se puede editar. Contacta al administrador si necesitas reactivarlo.');
+            }
+            abort(404, 'No se encontró el evento activo.');
         }
 
         $request->validate([

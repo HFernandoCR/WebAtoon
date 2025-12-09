@@ -34,6 +34,11 @@ class JudgeController extends Controller
             abort(403, 'No tienes asignado este proyecto.');
         }
 
+        // Validación: Verificar que el proyecto tenga entregables o URL de repositorio
+        if (empty($project->repository_url) && $project->deliverables()->count() === 0) {
+            return redirect()->back()->with('error', 'El equipo aún no ha subido ningún entregable ni ha proporcionado un enlace al repositorio. No es posible evaluar el proyecto todavía.');
+        }
+
         $evaluation = $project->judges()->where('user_id', Auth::id())->first()->pivot;
 
         return view('Judge.evaluate', compact('project', 'evaluation'));
@@ -57,6 +62,11 @@ class JudgeController extends Controller
 
         if (!$isAssigned) {
             abort(403, 'No tienes asignado este proyecto.');
+        }
+
+        // Validación: Verificar que el proyecto tenga entregables o URL de repositorio
+        if (empty($project->repository_url) && $project->deliverables()->count() === 0) {
+            return redirect()->back()->with('error', 'El proyecto no cuenta con entregables ni repositorio. No se puede guardar la evaluación.');
         }
 
         $event = $project->event;
