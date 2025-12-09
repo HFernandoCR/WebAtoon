@@ -23,7 +23,18 @@ class DashboardController extends Controller
             $data['totalJudges'] = User::role('judge')->count();
         } 
         elseif ($role === 'event_manager') {
-            $event = Event::where('manager_id', $user->id)->first();
+            // Priority 1: Active event managed by user
+            $event = Event::where('manager_id', $user->id)
+                ->active()
+                ->first();
+
+            // Priority 2: Latest event managed by user (fallback)
+            if (!$event) {
+                $event = Event::where('manager_id', $user->id)
+                    ->latest()
+                    ->first();
+            }
+
             $data['event'] = $event;
             
             if ($event) {
@@ -38,13 +49,34 @@ class DashboardController extends Controller
             }
         }
         elseif ($role === 'judge') {
-            $data['judgedProjects'] = $user->judgedProjects()->with('event')->get();
+            $data['judgedProjects'] = $user->judgedProjects()
+                ->whereHas('event', function($q) {
+                    $q->active();
+                })
+                ->with('event')
+                ->get();
         }
         elseif ($role === 'advisor') {
             $data['advisedProjects'] = $user->advisedProjects()->with(['members', 'event'])->get();
         }
         elseif ($role === 'student') {
-            $data['myProject'] = Project::where('user_id', $user->id)->with('event')->first();
+            // Priority 1: Project in an active event (Registration or In Progress)
+            $activeProject = Project::where('user_id', $user->id)
+                ->whereHas('event', function($q) {
+                    $q->active();
+                })
+                ->with('event')
+                ->first();
+
+            if ($activeProject) {
+                $data['myProject'] = $activeProject;
+            } else {
+                // Priority 2: Most recent project if no active one exists
+                $data['myProject'] = Project::where('user_id', $user->id)
+                    ->with('event')
+                    ->latest()
+                    ->first();
+            }
         }
 
         return view('dashboard', $data);
