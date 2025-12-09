@@ -6,16 +6,7 @@
         </h2>
     </x-slot>
 
-    <div class="flex min-h-screen bg-gray-100">
-        <!-- Sidebar is handled by the layout or included here if structure demands it, 
-             based on previous file it was included inside a flex container. 
-             If x-app-layout already has a slot for sidebar or typical structure, we adapt.
-             The previous file manually included sidebar. Let's maintain that structure but cleaner. -->
-        <div class="w-64 bg-slate-900 text-white flex-shrink-0 hidden md:block">
-             @include('sidebar')
-        </div>
-
-        <div class="flex-1 p-8">
+    <div class="p-8">
             <!-- Welcome Card -->
             <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
                 <h1 class="text-2xl font-bold text-gray-800">Hola, {{ Auth::user()->name }}</h1>
@@ -306,6 +297,5 @@
             </div>
             @endrole
 
-        </div>
-    </div>
+
 </x-app-layout>

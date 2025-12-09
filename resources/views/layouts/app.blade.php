@@ -19,114 +19,69 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased">
-    <style>
-        /* Estilos Responsivos */
-        .sidebar {
-            transition: transform 0.3s ease-in-out;
-            z-index: 50;
-        }
+<body class="font-sans antialiased text-gray-900 bg-gray-100">
 
-        #sidebarToggle {
-            display: none;
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 100;
-            background: #2c3e50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
+    <div x-data="{ sidebarOpen: false }" class="flex min-h-screen relative overflow-hidden">
 
-        @media (max-width: 768px) {
-            #sidebarToggle {
-                display: block;
-            }
+        <!-- Sidebar (Global Inclusion) -->
+        <!-- On Desktop: Relative, takes space. On Mobile: Fixed, Overlay handled by component css/js or alpine -->
+        <div class="shrink-0 h-screen sticky top-0 md:relative z-50">
+            @include('sidebar')
+        </div>
 
-            .flex-container {
-                flex-direction: column;
-            }
+        <!-- Main Content Column -->
+        <div class="flex-1 flex flex-col min-h-screen overflow-hidden relative w-full">
 
-            .sidebar-container {
-                position: fixed;
-                top: 0;
-                left: 0;
-                height: 100vh;
-                width: 260px;
-                transform: translateX(-100%);
-                z-index: 50;
-            }
+            <!-- Mobile Toggle (Visible only on mobile - serves as a trigger if sidebar is hidden) -->
+            <div class="md:hidden bg-[#2c3e50] text-white p-4 flex items-center justify-between shadow-md shrink-0">
+                <span class="font-bold text-lg">Menú</span>
+                <button onclick="toggleSidebar()" class="p-2 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
 
-            .sidebar-container.active {
-                transform: translateX(0);
-            }
+            @isset($header)
+                <header class="bg-white shadow shrink-0 z-40 relative">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex items-center gap-3">
+                        <img src="{{ asset('favicon.ico') }}" alt="Logo" class="h-10 w-10">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endisset
 
-            .main-content {
-                padding-top: 60px !important;
-                /* Espacio para el botón hamburguesa */
-                width: 100%;
-            }
-
-            /* Overlay para cerrar sidebar al hacer clic fuera */
-            #sidebarOverlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 40;
-            }
-
-            #sidebarOverlay.active {
-                display: block;
-            }
-        }
-
-        /* Force black text for headers */
-        header h2 {
-            color: black !important;
-        }
-    </style>
-
-    <button id="sidebarToggle" onclick="toggleSidebar()">
-        ☰ Menú
-    </button>
-    <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-    <div class="min-h-screen bg-gray-100 flex-container">
-        @include('layouts.navigation')
-
-        @isset($header)
-            <header class="{{ $headerClass ?? 'bg-[#d8b4fe]' }} shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex items-center gap-3">
-                    <img src="{{ asset('favicon.ico') }}" alt="Logo" class="h-10 w-10">
-                    {{ $header }}
-                </div>
-            </header>
-        @endisset
-
-        <!-- Page Content -->
-        <main>
-            {{ $slot }}
-        </main>
+            <!-- Page Content -->
+            <main class="flex-1 overflow-y-auto bg-gray-100">
+                {{ $slot }}
+            </main>
+        </div>
     </div>
 
-    {{-- Script Global para SweetAlert2 y Sidebar --}}
+    {{-- Script Global para Sidebar y SweetAlert2 --}}
     <script>
         function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar-container');
-            const overlay = document.getElementById('sidebarOverlay');
+            const sidebar = document.getElementById('sidebar-container');
+            const overlay = document.getElementById('mobile-overlay');
+
             if (sidebar) {
-                sidebar.classList.toggle('active');
+                // Tailwind classes for toggle
+                if (sidebar.classList.contains('-translate-x-full')) {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebar.classList.add('translate-x-0');
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    sidebar.classList.remove('translate-x-0');
+                }
             }
+
             if (overlay) {
-                overlay.classList.toggle('active');
+                if (overlay.classList.contains('hidden')) {
+                    overlay.classList.remove('hidden');
+                } else {
+                    overlay.classList.add('hidden');
+                }
             }
         }
 

@@ -5,156 +5,155 @@
         </h2>
     </x-slot>
 
-    <div style="display: flex; min-height: calc(100vh - 65px);">
-        <div style="width: 260px; background-color: #2c3e50; color: white; flex-shrink: 0;">
-            @include('sidebar')
-        </div>
+    <div class="p-6">
 
-        <div style="flex: 1; padding: 30px; background-color: #f3f4f6;">
+        <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm max-w-5xl mx-auto">
 
-            <div
-                style="max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-
-                {{-- Encabezado con Estado --}}
-                <div
-                    style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 20px;">
-                    <div>
-                        <h1 style="font-size: 2rem; font-weight: bold; color: #2c3e50; margin-bottom: 5px;">
-                            {{ $project->title }}</h1>
+            {{-- Encabezado con Estado --}}
+            <div class="flex flex-col md:flex-row justify-between items-start mb-6 border-b border-gray-100 pb-6 gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-800 mb-2">{{ $project->title }}</h1>
+                    <div class="flex flex-wrap items-center gap-2">
                         <span
-                            style="background: #3498db; color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.9em; text-transform: uppercase;">
+                            class="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
                             {{ $project->category }}
                         </span>
 
                         @if($project->average_score > 0)
-                            <span
-                                style="background: #e67e22; color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.9em; font-weight: bold; margin-left: 10px;">
+                            <span class="bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">
                                 ⭐ {{ number_format($project->average_score, 2) }} pts
                             </span>
                         @endif
 
                         @if($project->ranking_position)
-                            <span style="font-size: 1.2em; margin-left: 10px;">
+                            <span class="text-lg font-bold text-slate-700 ml-2">
                                 {{ $project->medal }} (#{{ $project->ranking_position }})
                             </span>
                         @endif
                     </div>
-
-                    <div>
-                        @php
-                            $statusColor = match ($project->status) {
-                                'approved' => '#2ecc71',
-                                'rejected' => '#e74c3c',
-                                default => '#f1c40f',
-                            };
-                            $statusLabel = match ($project->status) {
-                                'approved' => 'Aprobado',
-                                'rejected' => 'Rechazado',
-                                default => 'En Revisión (Pendiente)',
-                            };
-                        @endphp
-                        <div
-                            style="background-color: {{ $statusColor }}; color: white; padding: 8px 15px; border-radius: 5px; font-weight: bold; text-align: center;">
-                            {{ $statusLabel }}
-                        </div>
-                    </div>
                 </div>
 
-                {{-- Contenido Principal --}}
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+                <div>
+                    @php
+                        $statusClasses = match ($project->status) {
+                            'approved' => 'bg-green-100 text-green-700 border-green-200',
+                            'rejected' => 'bg-red-100 text-red-700 border-red-200',
+                            default => 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                        };
+                        $statusLabel = match ($project->status) {
+                            'approved' => 'Aprobado',
+                            'rejected' => 'Rechazado',
+                            default => 'En Revisión (Pendiente)',
+                        };
+                    @endphp
+                    <div class="px-4 py-2 rounded-lg font-bold border {{ $statusClasses }} text-center shadow-sm">
+                        {{ $statusLabel }}
+                    </div>
+                </div>
+            </div>
 
-                    {{-- Columna Izquierda: Descripción y Detalles --}}
+            {{-- Contenido Principal --}}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                {{-- Columna Izquierda: Descripción y Detalles --}}
+                <div class="lg:col-span-2">
+                    <div class="mb-8">
+                        <h3 class="font-bold text-lg text-slate-700 mb-3 border-l-4 border-blue-500 pl-3">
+                            Descripción del Proyecto</h3>
+                        <div
+                            class="prose max-w-none text-slate-600 leading-relaxed text-justify whitespace-pre-wrap bg-gray-50 p-4 rounded-lg border border-gray-100">
+                            {{ $project->description }}
+                        </div>
+                    </div>
+
+                    @if($project->repository_url)
+                        <div class="mb-8">
+                            <a href="{{ $project->repository_url }}" target="_blank"
+                                class="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white px-5 py-2.5 rounded-lg font-bold transition-colors shadow-sm">
+                                <i class="fab fa-github"></i> Ver Código Fuente
+                            </a>
+                        </div>
+                    @endif
+
+                    {{-- Integrantes --}}
                     <div>
-                        <h3 style="font-weight: bold; color: #555; margin-bottom: 10px;">Descripción del Proyecto</h3>
-                        <p
-                            style="line-height: 1.6; color: #666; margin-bottom: 20px; text-align: justify; white-space: pre-wrap;">
-                            {{ $project->description }}</p>
+                        <h3 class="font-bold text-lg text-slate-700 mb-4 border-l-4 border-purple-500 pl-3">Equipo
+                            de Desarrollo</h3>
 
-                        @if($project->repository_url)
-                            <div style="margin-bottom: 20px;">
-                                <a href="{{ $project->repository_url }}" target="_blank"
-                                    style="display: inline-block; background: #24292e; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; font-weight: bold;">
-                                    <i class="fab fa-github"></i> Ver Código Fuente
-                                </a>
+                        {{-- Líder --}}
+                        <div
+                            class="flex items-center bg-gray-50 p-3 rounded-lg border-l-4 border-blue-400 mb-3 shadow-sm">
+                            <img src="{{ $project->author->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($project->author->name) }}"
+                                class="w-10 h-10 rounded-full mr-4 bg-white p-0.5 shadow-sm">
+                            <div>
+                                <div class="font-bold text-slate-800">{{ $project->author->name }}</div>
+                                <div class="text-xs text-slate-500 font-medium uppercase tracking-wide">Líder del
+                                    Proyecto</div>
                             </div>
-                        @endif
+                        </div>
 
-                        {{-- Integrantes --}}
-                        <div style="margin-top: 30px;">
-                            <h3 style="font-weight: bold; color: #555; margin-bottom: 15px;">Equipo de Desarrollo</h3>
-
-                            {{-- Líder --}}
-                            <div
-                                style="display: flex; align-items: center; margin-bottom: 10px; background: #f8f9fa; padding: 10px; border-radius: 5px; border-left: 4px solid #3498db;">
-                                <img src="{{ $project->author->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($project->author->name) }}"
-                                    style="width: 40px; height: 40px; border-radius: 50%; margin-right: 15px;">
-                                <div>
-                                    <div style="font-weight: bold; color: #2c3e50;">{{ $project->author->name }}</div>
-                                    <div style="font-size: 0.85em; color: #7f8c8d;">Líder del Proyecto</div>
-                                </div>
-                            </div>
-
-                            {{-- Otros Miembros --}}
+                        {{-- Otros Miembros --}}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             @foreach($project->acceptedMembers as $member)
                                 <div
-                                    style="display: flex; align-items: center; margin-bottom: 10px; background: #fff; padding: 10px; border: 1px solid #eee; border-radius: 5px;">
+                                    class="flex items-center bg-white p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                                     <img src="{{ $member->user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($member->user->name) }}"
-                                        style="width: 30px; height: 30px; border-radius: 50%; margin-right: 15px;">
+                                        class="w-8 h-8 rounded-full mr-3 bg-gray-100">
                                     <div>
-                                        <div style="font-weight: bold; color: #555;">{{ $member->user->name }}</div>
-                                        <div style="font-size: 0.85em; color: #999;">Colaborador</div>
+                                        <div class="font-bold text-slate-700 text-sm">{{ $member->user->name }}</div>
+                                        <div class="text-xs text-gray-400">Colaborador</div>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
                     </div>
-
-                    {{-- Columna Derecha: Metadatos --}}
-                    <div>
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-                            <h4
-                                style="font-weight: bold; color: #555; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
-                                Información del Evento</h4>
-
-                            <div style="margin-bottom: 10px;">
-                                <small style="display: block; color: #999;">Evento</small>
-                                <strong style="color: #2c3e50;">{{ $project->event->name }}</strong>
-                            </div>
-
-                            <div style="margin-bottom: 10px;">
-                                <small style="display: block; color: #999;">Asesor</small>
-                                @if($project->advisor)
-                                    <strong style="color: #2c3e50;">{{ $project->advisor->name }}</strong>
-                                @else
-                                    <span style="color: #999; font-style: italic;">Sin Asesor</span>
-                                @endif
-                            </div>
-                        </div>
-
-                        {{-- Evaluaciones (Visible si hay puntuación) --}}
-                        @if($project->average_score > 0)
-                            <div
-                                style="background: #fff3cd; padding: 20px; border-radius: 10px; border: 1px solid #ffeeba;">
-                                <h4 style="font-weight: bold; color: #856404; margin-bottom: 10px;">Desempeño</h4>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 2.5em; font-weight: bold; color: #e67e22;">
-                                        {{ number_format($project->average_score, 1) }}
-                                    </div>
-                                    <div style="color: #856404; font-size: 0.9em;">Promedio Final</div>
-                                </div>
-                            </div>
-                        @endif
-
-                    </div>
-
                 </div>
 
-                <div style="margin-top: 30px; text-align: center;">
-                    <a href="{{ url()->previous() }}" style="color: #7f8c8d; text-decoration: none;">&larr; Volver</a>
+                {{-- Columna Derecha: Metadatos --}}
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-100 shadow-sm">
+                        <h4 class="font-bold text-slate-700 mb-4 pb-2 border-b border-gray-200">Información del
+                            Evento</h4>
+
+                        <div class="mb-4">
+                            <small class="uppercase text-xs font-bold text-gray-400">Evento</small>
+                            <div class="font-medium text-slate-800">{{ $project->event->name }}</div>
+                        </div>
+
+                        <div>
+                            <small class="uppercase text-xs font-bold text-gray-400">Asesor</small>
+                            @if($project->advisor)
+                                <div class="font-medium text-slate-800">{{ $project->advisor->name }}</div>
+                                <div class="text-xs text-gray-500">{{ $project->advisor->institution }}</div>
+                            @else
+                                <div class="italic text-gray-400">Sin Asesor</div>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Evaluaciones (Visible si hay puntuación) --}}
+                    @if($project->average_score > 0)
+                        <div class="bg-amber-50 p-5 rounded-lg border border-amber-100 shadow-sm text-center">
+                            <h4 class="font-bold text-amber-800 mb-2">Desempeño Final</h4>
+                            <div class="text-4xl font-extrabold text-amber-600 mb-1">
+                                {{ number_format($project->average_score, 1) }}
+                            </div>
+                            <div class="text-xs font-bold text-amber-700 uppercase tracking-widest">Puntos Promedio
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
             </div>
 
+            <div class="mt-8 pt-6 border-t border-gray-100 text-center">
+                <a href="{{ url()->previous() }}"
+                    class="text-gray-500 hover:text-gray-700 font-medium transition-colors flex items-center justify-center gap-2">
+                    <span>←</span> Volver atrás
+                </a>
+            </div>
+
         </div>
+
     </div>
 </x-app-layout>

@@ -3,78 +3,75 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Entregables del Proyecto') }}</h2>
     </x-slot>
 
-    <div style="display: flex; min-height: calc(100vh - 65px);">
-        <div style="width: 260px; background-color: #2c3e50; color: white; flex-shrink: 0;">@include('sidebar')</div>
+    <div class="p-6">
 
-        <div style="flex: 1; padding: 30px; background-color: #f3f4f6;">
+        <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+            <h3 class="text-xl font-bold text-slate-800 mb-4 border-b pb-2">Subir Nuevo Avance</h3>
+            <p class="text-gray-600 mb-6">Proyecto: <strong class="text-slate-800">{{ $project->title }}</strong>
+            </p>
 
-            <div
-                style="background: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <h3 style="font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; color: #2c3e50;">Subir Nuevo
-                    Avance</h3>
-                <p style="margin-bottom: 20px; color: #7f8c8d;">Proyecto: <strong>{{ $project->title }}</strong></p>
+            <form action="{{ route('deliverables.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="project_id" value="{{ $project->id }}">
 
-                <form action="{{ route('deliverables.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="project_id" value="{{ $project->id }}">
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
-                        <div>
-                            <label>Título del Archivo</label>
-                            <input type="text" name="title" required placeholder="Ej: Documentación Final"
-                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                        </div>
-                        <div>
-                            <label>Seleccionar Archivo (PDF/ZIP)</label>
-                            <input type="file" name="file" required
-                                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                    <div>
+                        <label class="block mb-2 text-gray-700 font-bold">Título del Archivo</label>
+                        <input type="text" name="title" required placeholder="Ej: Documentación Final"
+                            class="w-full p-2.5 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <label>Comentarios Adicionales</label>
-                        <input type="text" name="comments"
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <div>
+                        <label class="block mb-2 text-gray-700 font-bold">Seleccionar Archivo (PDF/ZIP)</label>
+                        <input type="file" name="file" required
+                            class="w-full p-2 border border-gray-300 rounded-md bg-gray-50 text-sm focus:ring-blue-500 focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                     </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block mb-2 text-gray-700 font-bold">Comentarios Adicionales</label>
+                    <input type="text" name="comments"
+                        class="w-full p-2.5 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                </div>
 
-                    <button type="submit"
-                        style="background: #3498db; color: white; padding: 10px 25px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Subir
-                        Archivo</button>
-                </form>
-            </div>
+                <button type="submit"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2.5 px-6 rounded-md shadow-sm transition-colors">
+                    Subir Archivo
+                </button>
+            </form>
+        </div>
 
-            <div style="background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <h3 style="font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; color: #2c3e50;">Historial de
-                    Entregas</h3>
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-xl font-bold text-slate-800 mb-4 border-b pb-2">Historial de Entregas</h3>
 
-                @if($deliverables->isEmpty())
-                    <p style="color: #999;">No has subido archivos aún.</p>
-                @else
-                    <table style="width: 100%; border-collapse: collapse;">
+            @if($deliverables->isEmpty())
+                <p class="text-gray-400 italic">No has subido archivos aún.</p>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr style="background: #f8f9fa;">
-                                <th style="padding: 10px; text-align: left;">Fecha</th>
-                                <th style="padding: 10px; text-align: left;">Título</th>
-                                <th style="padding: 10px; text-align: left;">Comentarios</th>
-                                <th style="padding: 10px; text-align: center;">Acción</th>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-gray-600">
+                                <th class="p-3 font-semibold">Fecha</th>
+                                <th class="p-3 font-semibold">Título</th>
+                                <th class="p-3 font-semibold">Comentarios</th>
+                                <th class="p-3 font-semibold text-center">Acción</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="divide-y divide-gray-100">
                             @foreach($deliverables as $file)
-                                <tr style="border-bottom: 1px solid #eee;">
-                                    <td style="padding: 10px;">{{ $file->created_at->format('d/m/Y') }}</td>
-                                    <td style="padding: 10px;"><strong>{{ $file->title }}</strong></td>
-                                    <td style="padding: 10px; color: #666;">{{ $file->comments ?? '-' }}</td>
-                                    <td style="padding: 10px; text-align: center;">
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="p-3 text-gray-600">{{ $file->created_at->format('d/m/Y') }}</td>
+                                    <td class="p-3 font-medium text-slate-800">{{ $file->title }}</td>
+                                    <td class="p-3 text-gray-500">{{ $file->comments ?? '-' }}</td>
+                                    <td class="p-3 text-center">
                                         <a href="{{ route('deliverables.download', $file->id) }}"
-                                            style="color: #2ecc71; font-weight: bold;">Descargar</a>
+                                            class="text-green-500 hover:text-green-700 font-bold hover:underline transition-colors">Descargar</a>
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
-                @endif
-            </div>
-
+                </div>
+            @endif
         </div>
+
     </div>
 </x-app-layout>

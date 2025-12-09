@@ -3,68 +3,62 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Panel de Asesoría') }}</h2>
     </x-slot>
 
-    <div style="display: flex; min-height: calc(100vh - 65px);">
-        <div style="width: 260px; background-color: #2c3e50; color: white; flex-shrink: 0;">@include('sidebar')</div>
+    <div class="p-6">
+        <h3 class="text-2xl font-bold text-slate-800 mb-6">Mis Equipos Asesorados</h3>
 
-        <div style="flex: 1; padding: 30px; background-color: #f3f4f6;">
-
-            <h3 style="font-size: 1.5rem; font-weight: bold; color: #2c3e50; margin-bottom: 20px;">
-                Mis Equipos Asesorados
-            </h3>
-
-            @if($projects->isEmpty())
-                <div style="background: white; padding: 40px; text-align: center; border-radius: 10px;">
-                    <p style="color: #7f8c8d;">Aún no tienes estudiantes asignados.</p>
-                </div>
-            @else
-                <div style="background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background: #f8f9fa;">
-                                <th style="padding: 12px; text-align: left;">Proyecto</th>
-                                <th style="padding: 12px; text-align: left;">Líder del Equipo</th>
-                                <th style="padding: 12px; text-align: left;">Competencia</th>
-                                <th style="padding: 12px; text-align: center;">Estado</th>
-                                <th style="padding: 12px; text-align: center;">Nota Promedio</th>
+        @if($projects->isEmpty())
+            <div class="bg-white p-10 text-center rounded-lg shadow-sm">
+                <p class="text-gray-500 text-lg">Aún no tienes estudiantes asignados.</p>
+            </div>
+        @else
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-50 border-b border-gray-100">
+                            <tr>
+                                <th class="p-4 font-semibold text-gray-600">Proyecto</th>
+                                <th class="p-4 font-semibold text-gray-600">Líder del Equipo</th>
+                                <th class="p-4 font-semibold text-gray-600">Competencia</th>
+                                <th class="p-4 font-semibold text-gray-600 text-center">Estado</th>
+                                <th class="p-4 font-semibold text-gray-600 text-center">Nota Promedio</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="divide-y divide-gray-100">
                             @foreach($projects as $project)
-                                <tr style="border-bottom: 1px solid #eee;">
-                                    <td style="padding: 12px;">
-                                        <strong>{{ $project->title }}</strong><br>
-                                        <span style="font-size: 0.8em; color: #666;">{{ ucfirst($project->category) }}</span>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="p-4">
+                                        <strong class="text-slate-800 block">{{ $project->title }}</strong>
+                                        <span class="text-xs text-gray-500 uppercase tracking-wide">{{ ucfirst($project->category) }}</span>
                                     </td>
-                                    <td style="padding: 12px;">
-                                        {{ $project->author->name }}<br>
-                                        <small>{{ $project->author->email }}</small>
+                                    <td class="p-4">
+                                        <div class="font-medium text-gray-800">{{ $project->author->name }}</div>
+                                        <small class="text-gray-500">{{ $project->author->email }}</small>
                                     </td>
-                                    <td style="padding: 12px;">{{ $project->event->name }}</td>
-                                    <td style="padding: 12px; text-align: center;">
+                                    <td class="p-4 text-gray-600">{{ $project->event->name }}</td>
+                                    <td class="p-4 text-center">
                                         @if($project->status == 'approved')
-                                            <span style="color: #2ecc71; font-weight: bold;">En Competencia</span>
+                                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wide">En Competencia</span>
                                         @elseif($project->status == 'pending')
-                                            <span style="color: #f1c40f; font-weight: bold;">Revisión Pendiente</span>
+                                            <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Revisión Pendiente</span>
                                         @else
-                                            <span style="color: #e74c3c; font-weight: bold;">Rechazado</span>
+                                            <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Rechazado</span>
                                         @endif
                                     </td>
-                                    <td style="padding: 12px; text-align: center;">
+                                    <td class="p-4 text-center">
                                         @php $avg = $project->judges->avg('pivot.score'); @endphp
                                         @if($avg)
-                                            <span style="font-size: 1.1em; font-weight: bold;">{{ number_format($avg, 1) }}</span>
+                                            <span class="text-lg font-bold text-slate-800">{{ number_format($avg, 1) }}</span>
                                         @else
-                                            <span style="color: #ccc;">-</span>
+                                            <span class="text-gray-300">-</span>
                                         @endif
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
-                    <div style="margin-top: 15px;">{{ $projects->links() }}</div>
                 </div>
-            @endif
-
-        </div>
+            </div>
+            <div class="mt-4">{{ $projects->links() }}</div>
+        @endif
     </div>
 </x-app-layout>
