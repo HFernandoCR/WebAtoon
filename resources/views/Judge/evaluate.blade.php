@@ -12,12 +12,14 @@
 
             <div style="max-width: 800px; margin: 0 auto;">
                 @if(session('success'))
-                    <div style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <div
+                        style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
                         {{ session('success') }}
                     </div>
                 @endif
                 @if(session('error'))
-                    <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <div
+                        style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
                         {{ session('error') }}
                     </div>
                 @endif
@@ -116,7 +118,7 @@
                             <label
                                 style="display: block; margin-bottom: 8px; font-weight: bold; color: #555;">Retroalimentación
                                 para el Estudiante</label>
-                            <textarea name="feedback" rows="6" required
+                            <textarea name="feedback" rows="6" required minlength="10"
                                 placeholder="Escribe aquí tus comentarios, sugerencias de mejora y observaciones (Mínimo 10 caracteres)..."
                                 style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; resize: vertical;"
                                 class="@error('feedback') border-red-500 @enderror">{{ old('feedback', $evaluation->feedback ?? '') }}</textarea>

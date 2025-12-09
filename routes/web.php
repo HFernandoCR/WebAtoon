@@ -19,6 +19,8 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
+Route::get('/validate-certificate', [App\Http\Controllers\CertificateValidationController::class, 'validateCertificate'])->name('certificate.validate');
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -126,8 +128,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
 });
-
-
-
 
 require __DIR__ . '/auth.php';

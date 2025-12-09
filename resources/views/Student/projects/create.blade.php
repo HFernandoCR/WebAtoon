@@ -47,7 +47,7 @@
 
                     <div style="margin-bottom: 15px;">
                         <label>Nombre del Proyecto</label>
-                        <input type="text" name="title" required placeholder="Ej: Brazo Robótico con IA"
+                        <input type="text" name="title" required maxlength="255" placeholder="Ej: Brazo Robótico con IA"
                             style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                     </div>
 
@@ -64,14 +64,15 @@
                         </div>
                         <div>
                             <label>Enlace al Repositorio (Opcional)</label>
-                            <input type="url" name="repository_url" placeholder="https://github.com/..."
+                            <input type="url" name="repository_url" pattern="https?://.+"
+                                placeholder="https://github.com/..."
                                 style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                         </div>
                     </div>
 
                     <div style="margin-bottom: 20px;">
                         <label>Descripción / Abstract</label>
-                        <textarea name="description" rows="5" required
+                        <textarea name="description" rows="5" required minlength="10"
                             placeholder="Describe brevemente de qué trata tu proyecto..."
                             style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
                     </div>
