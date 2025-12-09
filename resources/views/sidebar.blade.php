@@ -7,7 +7,7 @@
     <!-- User Profile -->
     <div class="relative z-10 flex flex-col items-center mb-10 text-center">
         <div class="mb-3 p-1 rounded-full bg-white/10">
-            <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : asset('images/default-avatar.svg') }}"
+            <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : asset('images/avatar.png') }}"
                 alt="User Avatar" class="w-20 h-20 rounded-full object-cover border-2 border-white/20">
         </div>
         <h4 class="font-medium text-lg tracking-wide">{{ Auth::user()->name }}</h4>
