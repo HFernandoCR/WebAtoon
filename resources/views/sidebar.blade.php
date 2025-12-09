@@ -28,6 +28,15 @@
                     Inicio / Dashboard
                 </a>
             </li>
+            
+            <li>
+                <a href="{{ route('events.active') }}"
+                    class="flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <span class="mr-3 text-gray-400 group-hover:text-blue-400 max-w-[20px] text-center"><i
+                            class="icon-calendar"></i></span>
+                    Eventos Activos
+                </a>
+            </li>
 
             <li>
                 <a href="{{ route('notifications.index') }}"
