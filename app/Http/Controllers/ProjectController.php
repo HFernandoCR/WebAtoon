@@ -14,11 +14,16 @@ class ProjectController extends Controller
      * Lista los proyectos DEL estudiante logueado.
      */
     /**
-     * Lista los proyectos DEL estudiante logueado.
+     * Lista los proyectos DEL estudiante logueado (como autor o miembro).
      */
     public function index(Request $request)
     {
-        $query = Project::where('user_id', Auth::id())->with('event', 'judges');
+        $query = Project::where(function($q) {
+            $q->where('user_id', Auth::id())
+              ->orWhereHas('members', function($m) {
+                  $m->where('user_id', Auth::id());
+              });
+        })->with('event', 'judges');
 
         if ($request->get('status') === 'active') {
             $query->whereHas('event', function($q) {
@@ -42,12 +47,17 @@ class ProjectController extends Controller
     {
         $this->authorize('create', Project::class);
 
-        // Check for existing active projects
-        $existingActiveProject = Project::where('user_id', Auth::id())
-            ->whereHas('event', function ($query) {
-                $query->active();
-            })
-            ->first();
+        // Check for existing active projects (as author or member)
+        $existingActiveProject = Project::where(function($q) {
+            $q->where('user_id', Auth::id())
+              ->orWhereHas('members', function($m) {
+                  $m->where('user_id', Auth::id())->where('status', 'accepted');
+              });
+        })
+        ->whereHas('event', function ($query) {
+            $query->active();
+        })
+        ->first();
 
         if ($existingActiveProject) {
             return redirect()->route('projects.index')->with('error', 'Ya tienes un proyecto activo (' . $existingActiveProject->title . '). No puedes registrar otro hasta que el evento finalice.');
@@ -82,12 +92,17 @@ class ProjectController extends Controller
         $event = Event::findOrFail($request->event_id);
         $now = now();
 
-        // Check for existing active projects (where event is not finished)
-        $existingActiveProject = Project::where('user_id', Auth::id())
-            ->whereHas('event', function ($query) {
-                $query->active(); // Scope defined in Event model (registration or in_progress)
-            })
-            ->first();
+        // Check for existing active projects (as author or member)
+        $existingActiveProject = Project::where(function($q) {
+            $q->where('user_id', Auth::id())
+              ->orWhereHas('members', function($m) {
+                  $m->where('user_id', Auth::id())->where('status', 'accepted');
+              });
+        })
+        ->whereHas('event', function ($query) {
+             $query->active();
+        })
+        ->first();
 
         if ($existingActiveProject) {
             return back()->withErrors(['error' => 'Ya tienes un proyecto activo en curso. Solo puedes registrar un nuevo proyecto cuando el evento actual haya finalizado.']);
