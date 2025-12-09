@@ -29,12 +29,22 @@ class EventManagerController extends Controller
             return view('Manager.no-event');
         }
 
-        $projects = Project::where('event_id', $event->id)
+        // Base query
+        $projectsQuery = Project::where('event_id', $event->id);
+
+        // Stats (Real counts independent of pagination)
+        $stats = [
+            'pending' => (clone $projectsQuery)->where('status', 'pending')->count(),
+            'approved' => (clone $projectsQuery)->where('status', 'approved')->count(),
+            'rejected' => (clone $projectsQuery)->where('status', 'rejected')->count(),
+        ];
+
+        $projects = $projectsQuery
             ->with(['author', 'judges'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('Manager.dashboard', compact('event', 'projects'));
+        return view('Manager.dashboard', compact('event', 'projects', 'stats'));
     }
 
     /**
@@ -97,14 +107,14 @@ class EventManagerController extends Controller
 
         // Filter judges: Show all judges, but mark those already assigned to THIS event
         // Actually, we usually show a list of assigned judges and a form/modal to add new ones.
-        
+
         $assignedJudges = $event->judges;
 
         // Available = ALL judges minus assigned
         // Note: User can add any judge not currently on the event.
         // We might want to warn if they are busy elsewhere, but strict blocking is tricky if they can handle mult. events.
         // User request: "que pueda asignar 3 juecez al evento en general"
-        
+
         $allJudges = User::role('judge')->get();
         $availableJudges = $allJudges->diff($assignedJudges);
 
@@ -140,13 +150,13 @@ class EventManagerController extends Controller
 
         // AUTO-ASSIGN TO ALL PROJECTS IN THIS EVENT
         foreach ($event->projects as $project) {
-             // Only attach if not already there (syncWithoutDetaching handles this for singular calls, but here we iterate)
-             $project->judges()->syncWithoutDetaching([$judge->id]);
-             
-             // Notify judge only once per event? Or per project? 
-             // "en automatico a los proyectos inscritos" -> probably per project so they know what to grade.
-             // But avoiding spamming 50 notifications is better. 
-             // Let's notify them about the EVENT assignment and let them see the list.
+            // Only attach if not already there (syncWithoutDetaching handles this for singular calls, but here we iterate)
+            $project->judges()->syncWithoutDetaching([$judge->id]);
+
+            // Notify judge only once per event? Or per project? 
+            // "en automatico a los proyectos inscritos" -> probably per project so they know what to grade.
+            // But avoiding spamming 50 notifications is better. 
+            // Let's notify them about the EVENT assignment and let them see the list.
         }
 
         // Notification for Event Assignment

@@ -16,15 +16,15 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-yellow-400">
                 <h4 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-1">Pendientes</h4>
-                <p class="text-3xl font-bold text-slate-800">{{ $projects->where('status', 'pending')->count() }}</p>
+                <p class="text-3xl font-bold text-slate-800">{{ $stats['pending'] }}</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-green-500">
                 <h4 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-1">Aprobados</h4>
-                <p class="text-3xl font-bold text-slate-800">{{ $projects->where('status', 'approved')->count() }}</p>
+                <p class="text-3xl font-bold text-slate-800">{{ $stats['approved'] }}</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-red-500">
                 <h4 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-1">Rechazados</h4>
-                <p class="text-3xl font-bold text-slate-800">{{ $projects->where('status', 'rejected')->count() }}</p>
+                <p class="text-3xl font-bold text-slate-800">{{ $stats['rejected'] }}</p>
             </div>
         </div>
 
