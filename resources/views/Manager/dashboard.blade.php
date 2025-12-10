@@ -106,8 +106,9 @@
                                                 @csrf @method('PATCH')
                                                 <input type="hidden" name="status" value="approved">
                                                 <button type="submit" title="Aprobar"
-                                                    class="h-8 w-8 rounded flex items-center justify-center bg-green-500 hover:bg-green-600 text-white transition-colors shadow-sm">
+                                                    class="h-8 px-3 rounded flex items-center justify-center bg-green-500 hover:bg-green-600 text-white transition-colors shadow-sm gap-1">
                                                     <i class="fas fa-check"></i>
+                                                    <span>Aceptar</span>
                                                 </button>
                                             </form>
                                         @endif
@@ -117,8 +118,9 @@
                                                 @csrf @method('PATCH')
                                                 <input type="hidden" name="status" value="rejected">
                                                 <button type="submit" title="Rechazar"
-                                                    class="h-8 w-8 rounded flex items-center justify-center bg-red-500 hover:bg-red-600 text-white transition-colors shadow-sm">
+                                                    class="h-8 px-3 rounded flex items-center justify-center bg-red-500 hover:bg-red-600 text-white transition-colors shadow-sm gap-1">
                                                     <i class="fas fa-times"></i>
+                                                    <span>Rechazar</span>
                                                 </button>
                                             </form>
                                         @endif
