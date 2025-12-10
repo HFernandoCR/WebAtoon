@@ -57,6 +57,11 @@ class CertificateController extends Controller
             return back()->with('error', 'No se encontró un proyecto válido asociado para generar la constancia.');
         }
 
+        // VALIDACIÓN: Las constancias solo se generan al finalizar el evento
+        if ($project->event->status !== 'finished') {
+            return back()->with('error', 'Las constancias solo están disponibles una vez que el evento ha finalizado.');
+        }
+
         // Formatos de fecha en español
         \Carbon\Carbon::setLocale('es');
         $eventStart = $project->event && $project->event->start_date ? \Carbon\Carbon::parse($project->event->start_date)->translatedFormat('d \d\e F \d\e Y') : 'N/A';
