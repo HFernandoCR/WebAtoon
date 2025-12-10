@@ -19,9 +19,9 @@
                     @php
                         // Determine availability
                         $isGraded = $proj->judges->whereNotNull('pivot.score')->count() > 0;
-                        $isAvailable = $proj->status === 'approved' ||
-                            $proj->event->status === \App\Models\Event::STATUS_FINISHED ||
-                            $isGraded;
+                        // Solo disponible si el evento ha FINALIZADO y el proyecto fue aprobado o evaluado
+                        $isAvailable = $proj->event->status === \App\Models\Event::STATUS_FINISHED &&
+                            ($proj->status === 'approved' || $isGraded);
                     @endphp
 
                     @if($isAvailable)
