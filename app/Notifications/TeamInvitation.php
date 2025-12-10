@@ -59,6 +59,8 @@ class TeamInvitation extends Notification implements ShouldQueue
     {
         return [
             'type' => 'team_invitation',
+            'title' => 'Invitación a Equipo',
+            'message' => 'Has sido invitado a unirte al proyecto "' . $this->project->title . '".',
             'project_id' => $this->project->id,
             'project_title' => $this->project->title,
             'event_name' => $this->eventName,
