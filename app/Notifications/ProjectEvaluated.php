@@ -69,6 +69,8 @@ class ProjectEvaluated extends Notification implements ShouldQueue
     {
         return [
             'type' => 'project_evaluated',
+            'title' => 'Proyecto Evaluado',
+            'message' => 'Tu proyecto "' . $this->project->title . '" ha sido evaluado por ' . $this->judgeName . '.',
             'project_id' => $this->project->id,
             'project_title' => $this->project->title,
             'final_score' => round($this->finalScore, 2),

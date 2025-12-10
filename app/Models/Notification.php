@@ -35,4 +35,14 @@ class Notification extends Model
     {
         return $query->whereNull('read_at');
     }
+
+    public function getTitleAttribute($value)
+    {
+        return $value ?? ($this->data['title'] ?? 'Notificación');
+    }
+
+    public function getMessageAttribute($value)
+    {
+        return $value ?? ($this->data['message'] ?? '');
+    }
 }
