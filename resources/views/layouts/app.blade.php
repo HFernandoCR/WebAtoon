@@ -21,19 +21,20 @@
 
 <body class="font-sans antialiased text-gray-900 bg-gray-100">
 
-    <div x-data="{ sidebarOpen: false }" class="flex min-h-screen relative overflow-hidden">
+    <div x-data="{ sidebarOpen: false }" class="flex min-h-screen bg-gray-100">
 
         <!-- Sidebar (Global Inclusion) -->
-        <!-- On Desktop: Relative, takes space. On Mobile: Fixed, Overlay handled by component css/js or alpine -->
-        <div class="shrink-0 h-screen sticky top-0 md:relative z-50 md:w-64 md:bg-slate-900">
-            @include('sidebar')
+        <!-- Sidebar (Global Inclusion) -->
+        <!-- Fixed/Sticky Sidebar for Desktop. Mobile: Wrapper exists but sidebar handles positioning. -->
+        <div class="z-50 md:w-64 md:flex-col md:fixed md:inset-y-0 md:bg-slate-900">
+             @include('sidebar')
         </div>
 
         <!-- Main Content Column -->
-        <div class="flex-1 flex flex-col min-h-screen overflow-hidden relative w-full">
+        <div class="flex-1 flex flex-col min-h-screen md:pl-64 transition-all duration-300">
 
-            <!-- Mobile Toggle (Visible only on mobile - serves as a trigger if sidebar is hidden) -->
-            <div class="md:hidden bg-[#2c3e50] text-white p-4 flex items-center justify-between shadow-md shrink-0">
+            <!-- Mobile Toggle (Visible only on mobile) -->
+            <div class="md:hidden bg-[#2c3e50] text-white p-4 flex items-center justify-between shadow-md sticky top-0 z-40">
                 <span class="font-bold text-lg">Menú</span>
                 <button onclick="toggleSidebar()" class="p-2 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,7 +45,7 @@
             </div>
 
             @isset($header)
-                <header class="bg-white shadow shrink-0 z-40 relative">
+                <header class="bg-white shadow z-30 relative">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex items-center gap-3">
                         <img src="{{ asset('favicon.ico') }}" alt="Logo" class="h-10 w-10">
                         {{ $header }}
@@ -53,7 +54,7 @@
             @endisset
 
             <!-- Page Content -->
-            <main class="flex-1 overflow-y-auto bg-gray-100">
+            <main class="flex-1 p-6">
                 {{ $slot }}
             </main>
         </div>
